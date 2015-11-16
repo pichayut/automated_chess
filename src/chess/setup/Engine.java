@@ -83,7 +83,12 @@ public class Engine {
 	public String computeMove(int myTime, int opTime) {
 	  //assert(false) : "Assertions should be disabled when playing competitively.";
 	  
-		return searcher.getBestMove(getBoard(), myTime, opTime).serverString();
+        
+        ArrayMove move = searcher.getBestMove(getBoard(), myTime, opTime);
+        if (move == null) {
+            return null;
+        }
+        return move.serverString();
 	}	
 
 	/**

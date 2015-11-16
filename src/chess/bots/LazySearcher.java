@@ -21,6 +21,10 @@ public class LazySearcher<M extends Move<M>, B extends Board<M,B>> extends Abstr
             best = new BestMove<M>(move, evaluator.infty());
             break; /* Choose the first move we look at!  We're lucky... */
         }
+
+        if (best == null) {
+            return null;
+        }
         return best.move;
     }
 }
