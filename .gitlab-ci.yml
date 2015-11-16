@@ -1,0 +1,2 @@
+TestBots:
+    script: curl -s https://courses.cs.washington.edu/courses/cse332/15au/homework/p3/gitlab-ci/testbots.sh | bash
