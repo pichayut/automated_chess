@@ -1,4 +1,4 @@
-package chess.testing;
+package tests;
 
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
