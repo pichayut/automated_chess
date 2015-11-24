@@ -14,11 +14,11 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
 
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-        BestMove<M> best = minimax(board, ply);
+        BestMove<M> best = minimax(this.evaluator, board, ply);
         return best.move;
     }
 
-    private BestMove<M> minimax(B board, int depth) {
+    static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth) {
         throw new NotYetImplementedException();
     }
 }
