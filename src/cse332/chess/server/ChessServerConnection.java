@@ -239,7 +239,7 @@ public class ChessServerConnection extends Thread {
                             hub.addMessage("    " + line.split(":GAMELIST ")[1]);
                         break;
                         case "SCORES":
-                            hub.addMessage("    " + line.split(":SCORES ")[1].split(" ", 1)[1]);
+                            hub.addMessage("    " + line.split(":SCORES ")[1].split(" ", 2)[1]);
                         break;
                         case "PLAY_WITH":
                             String challenger = contents.split(" ")[1];
