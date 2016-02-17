@@ -2,6 +2,7 @@ package chess.bots;
 
 import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
+import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 import cse332.exceptions.NotYetImplementedException;
 
