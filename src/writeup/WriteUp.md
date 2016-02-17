@@ -71,7 +71,7 @@ the experiment, do the following:
 #### Conclusions ####
 How close were your estimates to the actual values?  Did you find any
 entry in the table surprising?  Based ONLY on this table, do you feel
-like there is a substantial difference between the four algorithms?<pre>
+like there is a substantial difference between the four algorithms?
 <pre>TODO</pre>
 
 ### Optimizing Experiments ###
@@ -134,15 +134,14 @@ Plot your results and discuss anything surprising about your results here.
 In the last part of the project, you made a very small modification to your bot
 to solve a new problem.  We'd like you to think a bit more about the 
 formalization of the traffic problem as a graph in this question.  
-- To use Minimax to solve this problem, we had to represent it as a game.  
-  In particular,  the "states" of the game were "stretches of road" and the
-  valid moves were choices of other adjacent "stretches of road".  The
-  traffic and distance were factored in using the evaluation function.  If 
-  you wanted to use Dijkstra's Algorithm to solve this problem instead of
-  Minimax, how would you formulate it as a graph?<pre>
+- To use Minimax to solve this problem, we had to represent it as a game. In
+  particular, the "states" of the game were "stretches of road" and the valid
+  moves were choices of other adjacent "stretches of road".  The traffic and
+  distance were factored in using the evaluation function.  If you wanted to use
+  Dijkstra's Algorithm to solve this problem instead of Minimax, how would you
+  formulate it as a graph?
   <pre>TODO</pre>
-    **TODO**: Answer this question
-    </pre><br>
+
 - These two algorithms DO NOT optimize for the same thing.  (If they did,
   Dijkstra's is always faster; so, there would be no reason to ever use
   Minimax.)  Describe the difference in what each of the algorithms is
