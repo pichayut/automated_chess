@@ -20,7 +20,7 @@
 -----
 
 ## The Chess Server ##
-- When you faced Clamps, what did the code you used do?  Was it just your parallel alphabeta?  Did you do something fancier?
+- When you faced Clamps, what did the code you used do?  Was it just your jamboree?  Did you do something fancier?
   <pre>TODO</pre>
 
 - Did you enjoy watching your bot play on the server?  Is your bot better at chess than you are?
