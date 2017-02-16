@@ -88,7 +88,7 @@ public class Engine {
         if (move == null) {
             return null;
         }
-        return move.serverString();
+		return board.moveToSmithString(move);
 	}	
 
 	/**

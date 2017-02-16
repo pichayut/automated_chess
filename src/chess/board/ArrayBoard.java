@@ -2525,4 +2525,36 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
   	
   	return true;
   }
+
+	public String moveToSmithString(ArrayMove move) {
+		assert (isLegalMove(move));
+
+		StringBuffer moveString = new StringBuffer();
+
+		moveString.append(squareToString(move.source.square));
+		moveString.append(squareToString(move.dest.square));
+
+		ArrayPiece srcpiece = move.source;
+		ArrayPiece destpiece = move.dest;
+		int srcsq = srcpiece.square;
+		int destsq = destpiece.square;
+		boolean castle = false;
+
+		// castle moves are a special case
+		if (srcpiece.type() == KING) {
+			if (colOfSquare(srcsq) == 4) {
+				if (colOfSquare(destsq) == 6) {
+					// kingside castle
+					moveString.append("c");
+					castle = true;
+				} else if (colOfSquare(destsq) == 2) {
+					// queenside castle
+					moveString.append("C");
+					castle = true;
+				}
+			}
+		}
+
+		return moveString.toString();
+	}
 }
