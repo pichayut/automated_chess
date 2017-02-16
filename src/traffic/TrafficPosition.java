@@ -121,7 +121,7 @@ public class TrafficPosition implements Board<RoadSegment,TrafficPosition> {
     }
 
     @Override
-    public List<RoadSegment> generatePsuedoMoves() {
+    public List<RoadSegment> generatePseudoMoves() {
         return getMoves();
     }
     
@@ -137,7 +137,7 @@ public class TrafficPosition implements Board<RoadSegment,TrafficPosition> {
     }
 
     @Override
-    public boolean isLegalPsuedoMove(RoadSegment move) { return isLegalMove(move); }
+    public boolean isLegalPseudoMove(RoadSegment move) { return isLegalMove(move); }
 
     @Override
     public boolean isLegalMove(RoadSegment move) { 

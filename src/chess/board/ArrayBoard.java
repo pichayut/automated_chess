@@ -617,7 +617,7 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
       assert(noNullsOnBoard());
   }
   
-  public List<ArrayMove> generatePsuedoMoves()
+  public List<ArrayMove> generatePseudoMoves()
   {
   	List<ArrayPiece> piece_accum     = new ArrayList<ArrayPiece>(128);
   	List<ArrayMove>  move_accum      = new ArrayList<ArrayMove>(256);
@@ -831,13 +831,13 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
   
   public List<ArrayMove> generateMoves()
   {
-    List<ArrayMove> psmoves  = generatePsuedoMoves();
+    List<ArrayMove> psmoves  = generatePseudoMoves();
   	List<ArrayMove> moves    = new ArrayList<ArrayMove>(psmoves.size());
   	Set<ArrayMove>  setmoves = new HashSet<ArrayMove>(256);
   	
   	for(ArrayMove m : psmoves)
   	{
-  		if( setmoves.add(m) && isLegalPsuedoMove(m) )
+  		if( setmoves.add(m) && isLegalPseudoMove(m) )
   		{
   			moves.add(m);
   		}
@@ -867,8 +867,8 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
      * - for capturing, the dest piece must be of the opposite
      *    color.
      * 
-     * (*) If all of these are true, then the move is a psuedomove
-     *  so we can just call isLegalPsuedoMove to take care of
+     * (*) If all of these are true, then the move is a Pseudomove
+     *  so we can just call isLegalPseudoMove to take care of
      *  check and castling through check.
      */
     
@@ -990,7 +990,7 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
         && board[F1].isEmpty()
         && board[G1].isEmpty()
         && board[H1].piece == WHITE_ROOK
-        && isLegalPsuedoMove(move)
+        && isLegalPseudoMove(move)
         );
       }
     
@@ -1003,7 +1003,7 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
         && board[C1].isEmpty()
         && board[D1].isEmpty()
         && board[A1].piece == WHITE_ROOK
-        && isLegalPsuedoMove(move)
+        && isLegalPseudoMove(move)
         );
       }
     }
@@ -1018,7 +1018,7 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
         && board[F8].isEmpty()
         && board[G8].isEmpty()
         && board[H8].piece == BLACK_ROOK
-        && isLegalPsuedoMove(move)
+        && isLegalPseudoMove(move)
         );
       }    
     
@@ -1031,7 +1031,7 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
         && board[C8].isEmpty()
         && board[D8].isEmpty()
         && board[A8].piece == BLACK_ROOK
-        && isLegalPsuedoMove(move)
+        && isLegalPseudoMove(move)
         );
       }
     }
@@ -1140,10 +1140,10 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
     
     //move cannot leave king in check and castling moves cannot
     //castle through check.
-    return isLegalPsuedoMove(move);
+    return isLegalPseudoMove(move);
   }
   
-  public boolean isLegalPsuedoMove(ArrayMove move)
+  public boolean isLegalPseudoMove(ArrayMove move)
   {
   	ArrayPiece source = move.source;
   	ArrayPiece dest   = move.dest;
