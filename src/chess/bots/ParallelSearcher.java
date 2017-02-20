@@ -105,7 +105,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		if(board.inCheck()) {
     			return new BestMove<M>(-this.evaluator.mate() - ply).move; 
     		} else {
-    			return new BestMove<M>(-this.evaluator.stalemate()).move; 
+    			return new BestMove<M>(-this.evaluator.stalemate()).move;  
     		}
     	}
     	
