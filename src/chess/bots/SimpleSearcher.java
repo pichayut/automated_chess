@@ -16,16 +16,18 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
 
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-        BestMove<M> best = minimax(this.evaluator, board, ply);
+        BestMove<M> best = minimax(this.evaluator, board, ply, null);
         return best.move;
     }
 
-    static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth) {
+    static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth, List<M> moves) {
     	if(depth == 0) {
     		return new BestMove<M>(evaluator.eval(board));
     	}
     	
-    	List<M> moves = board.generateMoves();
+    	if(moves == null) {
+    		moves = board.generateMoves();
+    	}
     	
     	if(moves.isEmpty()) {
     		if(board.inCheck()) {
@@ -39,7 +41,7 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	M bestMove = null;
     	for(M move : moves) {
     		board.applyMove(move);
-    		int value = -minimax(evaluator, board, depth - 1).value;
+    		int value = -minimax(evaluator, board, depth - 1, null).value;
     		board.undoMove();
     		if(value > bestValue) {
     			bestValue = value;

@@ -14,24 +14,33 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
 	private static ForkJoinPool POOL = new ForkJoinPool();
-	private static final int DIVIDE_CUTOFF = 4;
+	private static final int DIVIDE_CUTOFF = 32;
 	
 	@SuppressWarnings("serial")
 	static class GetBestMoveTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
+		int divideCutoff;
 		int cutoff;
 		int depth;
 		int l, r;
 		List<M> moves;
 		B board;
 		Evaluator<B> e;
+		boolean hasToSwitch;
 		
-		public GetBestMoveTask(List<M> moves, B board, int l, int r, Evaluator<B> e, int depth, int cutoff) {
-			this.moves = moves;
+		public GetBestMoveTask(List<M> moves, B board, int l, int r, Evaluator<B> e, int depth, int cutoff, int divideCutoff, boolean  hasToSwitch) {
+			if(moves == null) {
+				this.moves = board.generateMoves();
+				this.r = this.moves.size();
+			} else {
+				this.moves = moves;
+				this.r = r;
+			}
 			this.board = board;
 			this.cutoff = cutoff;
+			this.divideCutoff = divideCutoff;
 			this.depth = depth;
+			this.hasToSwitch = hasToSwitch;
 			this.l = l;
-			this.r = r;
 			this.e = e;
 		}
 		
@@ -40,28 +49,24 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		}
 		
 		protected BestMove<M> compute() {
-			if(this.size() <= DIVIDE_CUTOFF) {
-				if(depth <= cutoff) {
-		    		return SimpleSearcher.minimax(e, board, depth);
+			if(this.size() <= this.divideCutoff) {
+				this.board = this.board.copy();
+				if(depth <= cutoff || this.size() == 0) {
+		    		return SimpleSearcher.minimax(e, board, depth, moves);
 				}
 				List<GetBestMoveTask<M, B>> taskList = new ArrayList<GetBestMoveTask<M, B>>();
-				for(int i = l; i < r; i++) {
+				board.applyMove(moves.get(l));
+				taskList.add(new GetBestMoveTask<M, B>(null, board.copy(), 0, -1, e, depth - 1, cutoff, divideCutoff, true));
+				board.undoMove();
+				for(int i = l + 1; i < r; i++) {
 					board.applyMove(moves.get(i));
-					List<M> lst = board.generateMoves();	
-					if(i < r - 1) {
-						B copyBoard = board.copy();
-						taskList.add(new GetBestMoveTask<M, B>(lst, copyBoard, 0, lst.size(), e, depth - 1, cutoff));
-						board.undoMove();
-					} else {
-						taskList.add(new GetBestMoveTask<M, B>(lst, board, 0, lst.size(), e, depth - 1, cutoff));
-					}
+					taskList.add(new GetBestMoveTask<M, B>(null, board.copy(), 0, -1, e, depth - 1, cutoff, divideCutoff, true));
+					taskList.get(i - l).fork();
+					board.undoMove();
 				}
-				for(int i = 0; i < taskList.size() - 1; i++) {
-		    		taskList.get(i).fork();
-		    	}
-				int bestValue = taskList.get(taskList.size() - 1).compute().negate().value;
-				M bestMove = moves.get(r - 1);
-				for(int i = 0; i < taskList.size() - 1; i++) {
+				int bestValue = taskList.get(0).compute().negate().value;
+				M bestMove = moves.get(l);
+				for(int i = 1; i < taskList.size(); i++) {
 					int newValue = taskList.get(i).join().negate().value;
 		    		if(newValue > bestValue) {
 		    			bestValue = newValue;
@@ -71,9 +76,8 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		    	return new BestMove<M>(bestMove, bestValue);
 			}
 			
-			B copyBoard = board.copy();
-			GetBestMoveTask<M, B> leftTask = new GetBestMoveTask<M, B>(moves, copyBoard, l, l + (r - l) / 2, e, depth, cutoff);
-			GetBestMoveTask<M, B> rightTask = new GetBestMoveTask<M, B>(moves, board, l + (r - l) / 2, r, e, depth, cutoff);
+			GetBestMoveTask<M, B> leftTask = new GetBestMoveTask<M, B>(moves, board, l, l + (r - l) / 2, e, depth, cutoff, divideCutoff, false);
+			GetBestMoveTask<M, B> rightTask = new GetBestMoveTask<M, B>(moves, board, l + (r - l) / 2, r, e, depth, cutoff, divideCutoff, false);
 			
 			leftTask.fork();
 			BestMove<M> answer = rightTask.compute();
@@ -88,7 +92,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	
     public M getBestMove(B board, int myTime, int opTime) {
     	List<M> moves = board.generateMoves();
-    	BestMove<M> bestMove = POOL.invoke(new GetBestMoveTask<M, B>(moves, board, 0, moves.size(), this.evaluator, ply, cutoff));
+    	BestMove<M> bestMove = POOL.invoke(new GetBestMoveTask<M, B>(moves, board, 0, moves.size(), this.evaluator, ply, cutoff, DIVIDE_CUTOFF, false));
     	return bestMove.move;
     }
 }
