@@ -14,7 +14,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
 	private static ForkJoinPool POOL = new ForkJoinPool();
-	private static final int DIVIDE_CUTOFF = 64;
+	private static final int DIVIDE_CUTOFF = 4;
 	
 	@SuppressWarnings("serial")
 	static class GetBestMoveTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
