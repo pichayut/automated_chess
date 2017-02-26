@@ -266,17 +266,13 @@ public final class GamePanel extends JPanel implements Observer {
                 board.clearPending();
                 try {
                     board.doSmithMove(smith);
+                    m_player.applyMove(smith);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 board.repaint();
 
                 if (amPlaying) {
-                    try {
-                        m_player.applyMove(smith);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                     doRun();
                 }
             }
@@ -346,7 +342,6 @@ public final class GamePanel extends JPanel implements Observer {
             String ur_move = m_player.computeMove((int) lowerClock.msecleft,
                     (int) upperClock.msecleft);
             if (ur_move != null && amPlaying) {
-                hub.pendingMove = ur_move;
                 hub.sendCmdArgs("MOVE", ur_move);
             }
         }

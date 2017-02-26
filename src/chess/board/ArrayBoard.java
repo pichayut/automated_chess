@@ -2538,7 +2538,6 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
 		ArrayPiece destpiece = move.dest;
 		int srcsq = srcpiece.square;
 		int destsq = destpiece.square;
-		boolean castle = false;
 
 		// castle moves are a special case
 		if (srcpiece.type() == KING) {
@@ -2546,14 +2545,16 @@ public class ArrayBoard implements Board<ArrayMove,ArrayBoard>
 				if (colOfSquare(destsq) == 6) {
 					// kingside castle
 					moveString.append("c");
-					castle = true;
 				} else if (colOfSquare(destsq) == 2) {
 					// queenside castle
 					moveString.append("C");
-					castle = true;
 				}
 			}
 		}
+		
+        if (move.isPromotion()) {
+        	moveString.append(move.promote.toString().toUpperCase());
+        }
 
 		return moveString.toString();
 	}
