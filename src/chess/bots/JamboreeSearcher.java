@@ -15,7 +15,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	
 	private static ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.67; // 0.4375
-    private static final int DIVIDE_CUTOFF = 1000000;
+    private static final int DIVIDE_CUTOFF = 2;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
