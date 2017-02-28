@@ -13,7 +13,7 @@ import cse332.chess.interfaces.Move;
 public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
-	private static ForkJoinPool POOL = new ForkJoinPool();
+	private static final ForkJoinPool POOL = new ForkJoinPool();
 	private static final int DIVIDE_CUTOFF = 4;
 	
 	static class GetBestMoveTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
@@ -87,7 +87,6 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	
     public M getBestMove(B board, int myTime, int opTime) {
     	List<M> moves = board.generateMoves();
-    	BestMove<M> bestMove = POOL.invoke(new GetBestMoveTask<M, B>(moves, board, 0, moves.size(), this.evaluator, ply, cutoff, DIVIDE_CUTOFF));
-    	return bestMove.move;
+    	return POOL.invoke(new GetBestMoveTask<M, B>(moves, board, 0, moves.size(), this.evaluator, ply, cutoff, DIVIDE_CUTOFF)).move;
     }
 }
