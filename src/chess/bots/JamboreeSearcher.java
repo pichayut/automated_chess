@@ -17,7 +17,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     private static final double PERCENTAGE_SEQUENTIAL = 0.67; // 0.4375
     private static final int DIVIDE_CUTOFF = 2;
     
-    public M getBestMove(B board, int myTime, int opTime) {
+    public M getBestMove(B board, int myTime, int opTime) { 
         /* Calculate the best move */
     	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
         return bestMove.move;
