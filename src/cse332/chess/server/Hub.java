@@ -24,6 +24,7 @@ public class Hub extends JPanel {
         public String blackTime;
         public String board;
         public String currentPlayer;
+        public String lastMove;
 
         public GameState(Object value, String name) {
             String[] pieces = ((String) value).split(":");
@@ -40,6 +41,7 @@ public class Hub extends JPanel {
             blackTime = pieces[6].trim().split(" ")[0];
             board = pieces[7].trim().split(" ")[0];
             currentPlayer = pieces[7].trim().split(" ")[1];
+            lastMove = pieces[8].trim().split(" ")[0];
         }
     }
 
@@ -50,9 +52,6 @@ public class Hub extends JPanel {
     public EasyChess applet;
 
     private MessagePanel messagePanel;
-
-    public String pendingMove = null;
-    public boolean pendingState = false;
 
     private GamePanel gamePanel;
 
@@ -134,52 +133,43 @@ public class Hub extends JPanel {
             if (applet == null) {
                 connection.send("", "match " + whoToMatch);
             }
-            break;
+        break;
         case "MAIN":
             messagePanel.receive("MAIN", value);
             break;
         case "ILLEGAL":
             messagePanel.receive("ILLEGAL", value);
-            break;
+        break;
         case "GAME_REQUEST":
             messagePanel.receive("ADD_MATCH", value);
-            break;
+        break;
         case "GAME_SETUP":
             try {
                 gameState = new GameState(value, myName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            if (pendingMove != null) {
-                String move = pendingMove;
-                pendingMove = null;
-                gamePanel.receive("MADE_MOVE", move);
-            } else {
-                pendingState = true;
-            }
+           
+            String move = gameState.lastMove;
+            gamePanel.receive("MADE_MOVE", move);
+            
             if (!gameState.imPlaying) {
                 gamePanel.receive("STARTED_OBSERVING", myName);
             }
-
-            break;
+        break;
         case "MOVE":
-            String v = (String) value;
-            if (pendingState) {
-                gamePanel.receive("MADE_MOVE", v);
-            } else {
-                pendingMove = v;
-            }
-            break;
+        	/* no longer necessary as of 17wi; superceded by GAME_SETUP! */
+        break;
         case "START":
             gamePanel.receive("GAME_STARTED", myName);
-            break;
+        break;
         case "END":
             gamePanel.receive("GAME_OVER", myName);
+            connection.setGameChannel(null);
             if (applet == null) {
                 System.exit(1);
             }
-            break;
+        break;
         }
     }
 

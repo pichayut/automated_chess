@@ -239,7 +239,13 @@ public class ChessServerConnection extends Thread {
                             hub.addMessage("    " + line.split(":GAMELIST ")[1]);
                         break;
                         case "SCORES":
-                            hub.addMessage("    " + line.split(":SCORES ")[1].split(" ", 2)[1]);
+                            String[] scores = line.split(":SCORES ")[1].split(" ", 2);
+                            if (scores.length > 1) {
+                        	    hub.addMessage("    " + scores[1]);
+                            }
+                            else {
+                        	    hub.addMessage("    <no games played>");
+                            }
                         break;
                         case "PLAY_WITH":
                             String challenger = contents.split(" ")[1];
@@ -277,7 +283,7 @@ public class ChessServerConnection extends Thread {
                                     }
                                 break;
                                 case "ILLEGAL":
-                                    if (!iWon && !nick.equals(winner)) {
+                                    if (!iWon && !hub.gameState.imPlaying) {
                                         hub.addMessage(winner + " won!"); 
                                     }
                                     else if (iWon) {
@@ -288,7 +294,7 @@ public class ChessServerConnection extends Thread {
                                     }
                                 break;
                                 case "NOTIME":
-                                    if (!iWon && !nick.equals(winner)) {
+                                    if (!iWon && !hub.gameState.imPlaying) {
                                         hub.addMessage(winner + " won!"); 
                                     }
                                     else if (iWon) {
@@ -300,7 +306,7 @@ public class ChessServerConnection extends Thread {
 
                                 break;
                                 case "CHECKMATE":
-                                    if (!iWon && !nick.equals(winner)) {
+                                    if (!iWon && !hub.gameState.imPlaying) {
                                         hub.addMessage(winner + " won!"); 
                                     }
                                     else if (iWon) {
@@ -335,7 +341,7 @@ public class ChessServerConnection extends Thread {
                     channel = parts[parts.length - 1]; 
                     if (who.equals(CHESS_RUNNER)) {
                         // If I REQUESTED, just join the channel
-                        if (this.gameChannel != null && this.gameChannel.equals("REQUESTED")) {
+                        if (this.gameChannel != null) {
                             this.gameChannel = channel;
                             write("JOIN", gameChannel);
                         }
