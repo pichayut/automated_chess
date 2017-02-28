@@ -26,7 +26,10 @@ public class ParallelMinimaxTests extends SearcherTests {
 	    
         test("depth2", TestingInputs.FENS_TO_TEST.length);
         test("depth3", TestingInputs.FENS_TO_TEST.length);
+        long startTime = System.currentTimeMillis();
         test("depth4", TestingInputs.FENS_TO_TEST.length);
+        long endTime = System.currentTimeMillis();
+        System.out.println(endTime - startTime);
 		finish();
 	} 
 }
