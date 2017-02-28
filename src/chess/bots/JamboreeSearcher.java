@@ -124,7 +124,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		    		alpha = value;
 		    		bestMove = this.moves.get(ed - 1);
 		    	}
-		    	if (alpha >= beta) {
+		    	if (alpha >= beta) { 
 		    		return new BestMove<M>(bestMove, alpha);
 		    	}
 		    	//---------------------
