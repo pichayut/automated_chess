@@ -17,9 +17,10 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     private static final double PERCENTAGE_SEQUENTIAL = 0.67; // 0.4375
     private static final int DIVIDE_CUTOFF = 2;
     
-    public M getBestMove(B board, int myTime, int opTime) { 
+    public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	return POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false)).move;
+    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
+        return bestMove.move;
     }
     
     static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
@@ -29,9 +30,9 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	int depth, alpha, beta;
     	int cutoff, divideCutoff;
     	int l, r;
-    	boolean alreadyHaveGoodAlphaBeta;
+    	boolean AlreadyHaveGoodAlphaBeta;
     	
-    	public JamboreeSubTask(Evaluator<B> e, B board, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean alreadyHaveGoodAlphaBeta) {
+    	public JamboreeSubTask(Evaluator<B> e, B board, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean AlreadyHaveGoodAlphaBeta) {
     		this.e = e;
     		this.board = board;
     		this.depth = depth;
@@ -42,16 +43,16 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		this.l = l;
     		this.r = r;
     		this.divideCutoff = divideCutoff;
-    		this.alreadyHaveGoodAlphaBeta = alreadyHaveGoodAlphaBeta;
+    		this.AlreadyHaveGoodAlphaBeta = AlreadyHaveGoodAlphaBeta;
     	}
     	
     	public int size() {
-			return r - l;
+			return this.r - this.l;
 		}
     	
 		protected BestMove<M> compute() {
 			M bestMove = null;
-			if(!alreadyHaveGoodAlphaBeta) {
+			if(!AlreadyHaveGoodAlphaBeta) {
 				this.board = this.board.copy();
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
@@ -77,7 +78,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			}
 
 			int st, ed;
-			if(!alreadyHaveGoodAlphaBeta) {
+			if(!AlreadyHaveGoodAlphaBeta) {
 				st = l + (int) (PERCENTAGE_SEQUENTIAL * this.size());
 				ed = r;
 			} else {
