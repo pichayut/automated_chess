@@ -26,7 +26,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		while (depth <= ply) {
 			bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
 			depth++;
-		}
+		} 
 		return bestMove.move;
     }
     
