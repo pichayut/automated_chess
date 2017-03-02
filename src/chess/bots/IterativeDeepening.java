@@ -49,7 +49,7 @@ public class IterativeDeepening<M extends Move<M>, B extends Board<M, B>> extend
 			}
 		}
 		*/
-		if (depth == 0 || moves == null) {
+		if (depth == 0 || moves.isEmpty()) {
 			return new BestMove<M>(color * evaluator.eval(board));
 		}
 		
