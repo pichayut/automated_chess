@@ -14,17 +14,18 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
 	private static ForkJoinPool POOL = new ForkJoinPool();
-    private static final double PERCENTAGE_SEQUENTIAL = 0.67; // 0.4375
-    private static final int DIVIDE_CUTOFF = 2;
+    private static final double PERCENTAGE_SEQUENTIAL = 0.4375; // 0.4375
+    private static final int DIVIDE_CUTOFF = 4;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
+    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
         return bestMove.move;
     }
     
     static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
     	List<M> moves;
+    	M move;
     	B board;
     	Evaluator<B> e;
     	int depth, alpha, beta;
@@ -32,8 +33,9 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	int l, r;
     	boolean AlreadyHaveGoodAlphaBeta;
     	
-    	public JamboreeSubTask(Evaluator<B> e, B board, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean AlreadyHaveGoodAlphaBeta) {
+    	public JamboreeSubTask(Evaluator<B> e, B board, M move, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean AlreadyHaveGoodAlphaBeta) {
     		this.e = e;
+    		this.move = move;
     		this.board = board;
     		this.depth = depth;
     		this.moves = moves;
@@ -54,6 +56,11 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			M bestMove = null;
 			if(!AlreadyHaveGoodAlphaBeta) {
 				this.board = this.board.copy();
+				if(this.move != null) {
+					this.board.applyMove(this.move);
+					this.move = null;
+				}
+
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
@@ -65,7 +72,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		    	for (int i = l; i < l + (int) (PERCENTAGE_SEQUENTIAL * this.size()); i++) {
 		    		M move = this.moves.get(i);
 		    		this.board.applyMove(move);
-		    		int value = new JamboreeSubTask<M, B>(this.e, this.board, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false).compute().negate().value;
+		    		int value = new JamboreeSubTask<M, B>(this.e, this.board, null, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false).compute().negate().value;
 		    		this.board.undoMove();
 		    		if (value > alpha) {
 		    			alpha = value;
@@ -87,8 +94,8 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			}
 			
 			if(this.size() > this.divideCutoff) {
-				JamboreeSubTask<M, B> leftTask = new JamboreeSubTask<M, B>(e, board, depth, moves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true);
-				JamboreeSubTask<M, B> rightTask = new JamboreeSubTask<M, B>(e, board, depth, moves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true);
+				JamboreeSubTask<M, B> leftTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true);
+				JamboreeSubTask<M, B> rightTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true);
 				
 				leftTask.fork();
 				BestMove<M> answer = rightTask.compute();
@@ -102,23 +109,28 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 					bestMove = leftAnswer.move;
 				}
 				return new BestMove<M>(bestMove, alpha);
-			} else {		
+			} else {
 				this.board = this.board.copy();
+				if(this.move != null) {
+					this.board.applyMove(this.move);
+					this.move = null;
+				}
+				
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
 		    	}
 				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
 		    	for (int i = st; i < ed - 1; i++) {
-		    		board.applyMove(this.moves.get(i));
-		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board.copy(), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
+		    		//board.applyMove(this.moves.get(i));
+		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
 		    		taskList.get(i - st).fork();
-		    		board.undoMove();
+		    		//board.undoMove();
 		    	}
 		    	
 		    	// do one work yourself
-		    	board.applyMove(this.moves.get(ed - 1));
-		    	JamboreeSubTask<M, B> current = new JamboreeSubTask<M, B>(this.e, this.board, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false);
+		    	//board.applyMove(this.moves.get(ed - 1));
+		    	JamboreeSubTask<M, B> current = new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(ed - 1), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false);
 		    	int value = current.compute().negate().value;
 		    	if (value > alpha) {
 		    		alpha = value;

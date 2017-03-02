@@ -5,7 +5,7 @@ import chess.board.ArrayMove;
 import chess.game.SimpleEvaluator;
 import cse332.chess.interfaces.Move;
 import cse332.chess.interfaces.Searcher;
-
+import chess.bots.DeepeningJamboree;
 import chess.bots.JamboreeSearcher;
 
 import tests.TestsUtility;

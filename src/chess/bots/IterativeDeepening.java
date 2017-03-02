@@ -20,15 +20,15 @@ public class IterativeDeepening<M extends Move<M>, B extends Board<M, B>> extend
 	public M getBestMove(B board, int myTime, int opTime) {
 		int depth = 1;
 		BestMove<M> bestMove = null;
-		while (depth < ply) {
-			bestMove = negaMax(this.evaluator, board, depth, null, -this.evaluator.infty(), this.evaluator.infty(), 1);
+		while (depth <= ply) {
+			bestMove = negaMax(this.evaluator, board, depth, null, -this.evaluator.infty(), this.evaluator.infty());
 			depth++;
 		}
 		return bestMove.move;
 		//return POOL.invoke(new IterativeSubTask<M,B>(this.evaluator, board, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false)).move;
 	}
 	
-	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> negaMax(Evaluator<B> evaluator, B board, int depth, List<M> moves, int alpha, int beta, int color) {
+	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> negaMax(Evaluator<B> evaluator, B board, int depth, List<M> moves, int alpha, int beta) {
 		int alphaOrig = alpha;
 		if (moves == null) {
 			moves = board.generateMoves();
@@ -49,14 +49,23 @@ public class IterativeDeepening<M extends Move<M>, B extends Board<M, B>> extend
 			}
 		}
 		*/
-		if (depth == 0 || moves.isEmpty()) {
-			return new BestMove<M>(color * evaluator.eval(board));
+		
+		if(depth == 0) {
+    		return new BestMove<M>(evaluator.eval(board));
+    	}
+		
+		if (moves.isEmpty()) {
+			if(board.inCheck()) {
+    			return new BestMove<M>(-evaluator.mate() - depth);
+    		} else {
+    			return new BestMove<M>(-evaluator.stalemate());
+    		}
 		}
 		
 		M bestMove = null;
 		for (M move : moves) {
 			board.applyMove(move);
-    		int value = -negaMax(evaluator, board, depth - 1, null, -beta, -alpha, -color).value;
+    		int value = -negaMax(evaluator, board, depth - 1, null, -beta, -alpha).value;
     		board.undoMove();
     		if (value > alpha) {
     			alpha = value;
