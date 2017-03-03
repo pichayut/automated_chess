@@ -28,7 +28,7 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		} else {
     			return new BestMove<M>(-evaluator.stalemate());
     		}
-    	}
+    	} 
     	
     	M bestMove = null;
     	for(M move : moves) {
