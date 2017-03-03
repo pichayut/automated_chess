@@ -25,11 +25,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     }
     
     public static <M extends Move<M>> int compare(M m1, M m2) {
-    	if(Boolean.compare(m2.isCapture(), m1.isCapture()) != 0) {
-    		return Boolean.compare(m2.isCapture(), m1.isCapture());
-    	} else {
-    		return Boolean.compare(m2.isPromotion(), m1.isPromotion());
-    	}
+    	return Boolean.compare(m2.isCapture(), m1.isCapture());
     }
     
     static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
