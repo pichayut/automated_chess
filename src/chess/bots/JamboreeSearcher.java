@@ -21,7 +21,6 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	startTime = System.currentTimeMillis();
     	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
         return bestMove.move;
     }
@@ -45,9 +44,6 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		this.move = move;
     		this.board = board;
     		this.depth = depth;
-    		if(System.currentTimeMillis() - startTime >= 5000) {
-    			this.depth--;
-    		}
     		this.moves = moves;
     		this.alpha = alpha;
     		this.beta = beta;
@@ -135,9 +131,10 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		    		Collections.sort(this.moves, JamboreeSearcher::compare);
 		    	}
 				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
+				int mid = st + (ed - st) / 2;
 		    	for (int i = st; i < ed - 1; i++) {
 		    		//board.applyMove(this.moves.get(i));
-		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
+		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), (i < mid) ? this.depth - 1 : this.depth - 2, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
 		    		taskList.get(i - st).fork();
 		    		//board.undoMove();
 		    	}
