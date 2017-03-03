@@ -15,19 +15,13 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
 	private static ForkJoinPool POOL = new ForkJoinPool();
-    private static final double PERCENTAGE_SEQUENTIAL = 0.5; // 0.4375
+    private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
-    private static final double FACTION = 0.65;
-    private static long startTime;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
     	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
         return bestMove.move;
-    }
-    
-    public static <M extends Move<M>> int compare(M m1, M m2) {
-    	return Boolean.compare(m2.isCapture(), m1.isCapture());
     }
     
     static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
@@ -71,8 +65,6 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
-		    		
-		    		Collections.sort(this.moves, JamboreeSearcher::compare);
 		    	}
 				
 				if(this.depth <= this.cutoff || this.moves.size() == 0) {
@@ -128,14 +120,11 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
-		    		
-		    		Collections.sort(this.moves, JamboreeSearcher::compare);
 		    	}
 				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
-				double mid = st + FACTION * (ed - st) / 2;
 		    	for (int i = st; i < ed - 1; i++) {
 		    		//board.applyMove(this.moves.get(i));
-		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), (i < mid) ? this.depth - 1 : this.depth - 2, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
+		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
 		    		taskList.get(i - st).fork();
 		    		//board.undoMove();
 		    	}
