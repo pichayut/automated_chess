@@ -17,9 +17,11 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	private static ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; // 0.4375
     private static final int DIVIDE_CUTOFF = 2;
+    private static long startTime;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
+    	startTime = System.currentTimeMillis();
     	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
         return bestMove.move;
     }
@@ -43,6 +45,9 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		this.move = move;
     		this.board = board;
     		this.depth = depth;
+    		if(System.currentTimeMillis() - startTime >= 5000) {
+    			this.depth--;
+    		}
     		this.moves = moves;
     		this.alpha = alpha;
     		this.beta = beta;
