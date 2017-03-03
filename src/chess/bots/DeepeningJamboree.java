@@ -1,6 +1,8 @@
 package chess.bots;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
@@ -12,26 +14,24 @@ import cse332.chess.interfaces.Move;
 public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
-	private ForkJoinPool POOL = new ForkJoinPool();
-    private final double PERCENTAGE_SEQUENTIAL = 0.67; // 0.4375
-    private final int DIVIDE_CUTOFF = 2;
-    
-    private Map<M, Integer> hh; // history heuristic
+	private static ForkJoinPool POOL = new ForkJoinPool();
+    private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
+    private static final int DIVIDE_CUTOFF = 2;
+    private static final double FACTION = 1; //0.65;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	int depth = 1;
-		BestMove<M> bestMove = null;
-		hh = new HashMap<M, Integer>();
-		while (depth <= ply) {
-			bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
-			depth++;
-		} 
-		return bestMove.move;
+    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
+        return bestMove.move;
     }
     
-    public class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
+    public static <M extends Move<M>> int compare(M m1, M m2) {
+    	return Boolean.compare(m2.isCapture(), m1.isCapture());
+    }
+    
+    static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
     	List<M> moves;
+    	M move;
     	B board;
     	Evaluator<B> e;
     	int depth, alpha, beta;
@@ -39,8 +39,9 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	int l, r;
     	boolean AlreadyHaveGoodAlphaBeta;
     	
-    	public JamboreeSubTask(Evaluator<B> e, B board, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean AlreadyHaveGoodAlphaBeta) {
+    	public JamboreeSubTask(Evaluator<B> e, B board, M move, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean AlreadyHaveGoodAlphaBeta) {
     		this.e = e;
+    		this.move = move;
     		this.board = board;
     		this.depth = depth;
     		this.moves = moves;
@@ -61,13 +62,16 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 			M bestMove = null;
 			if(!AlreadyHaveGoodAlphaBeta) {
 				this.board = this.board.copy();
+				if(this.move != null) {
+					this.board.applyMove(this.move);
+					this.move = null;
+				}
+
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
 		    		
-		    		for(int child = 1; child <= this.moves.size(); child++) {
-		    			//score[child] = 
-		    		}
+		    		Collections.sort(this.moves, DeepeningJamboree::compare);
 		    	}
 				
 				if(this.depth <= this.cutoff || this.moves.size() == 0) {
@@ -76,7 +80,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    	for (int i = l; i < l + (int) (PERCENTAGE_SEQUENTIAL * this.size()); i++) {
 		    		M move = this.moves.get(i);
 		    		this.board.applyMove(move);
-		    		int value = new JamboreeSubTask<M, B>(this.e, this.board, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false).compute().negate().value;
+		    		int value = new JamboreeSubTask<M, B>(this.e, this.board, null, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false).compute().negate().value;
 		    		this.board.undoMove();
 		    		if (value > alpha) {
 		    			alpha = value;
@@ -98,8 +102,8 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 			}
 			
 			if(this.size() > this.divideCutoff) {
-				JamboreeSubTask<M, B> leftTask = new JamboreeSubTask<M, B>(e, board, depth, moves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true);
-				JamboreeSubTask<M, B> rightTask = new JamboreeSubTask<M, B>(e, board, depth, moves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true);
+				JamboreeSubTask<M, B> leftTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true);
+				JamboreeSubTask<M, B> rightTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true);
 				
 				leftTask.fork();
 				BestMove<M> answer = rightTask.compute();
@@ -113,23 +117,31 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 					bestMove = leftAnswer.move;
 				}
 				return new BestMove<M>(bestMove, alpha);
-			} else {		
+			} else {
 				this.board = this.board.copy();
+				if(this.move != null) {
+					this.board.applyMove(this.move);
+					this.move = null;
+				}
+				
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
+		    		
+		    		Collections.sort(this.moves, DeepeningJamboree::compare);
 		    	}
 				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
+				double mid = st + FACTION * (ed - st) / 2;
 		    	for (int i = st; i < ed - 1; i++) {
-		    		board.applyMove(this.moves.get(i));
-		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board.copy(), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
+		    		//board.applyMove(this.moves.get(i));
+		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), (i < mid) ? this.depth - 1 : this.depth - 2, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
 		    		taskList.get(i - st).fork();
-		    		board.undoMove();
+		    		//board.undoMove();
 		    	}
 		    	
 		    	// do one work yourself
-		    	board.applyMove(this.moves.get(ed - 1));
-		    	JamboreeSubTask<M, B> current = new JamboreeSubTask<M, B>(this.e, this.board, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false);
+		    	//board.applyMove(this.moves.get(ed - 1));
+		    	JamboreeSubTask<M, B> current = new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(ed - 1), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false);
 		    	int value = current.compute().negate().value;
 		    	if (value > alpha) {
 		    		alpha = value;
@@ -150,12 +162,6 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 			    		return new BestMove<M>(bestMove, alpha);
 			    	}
 		    	}
-		    	
-		    	if(!hh.containsKey(bestMove)) {
-		    		hh.put(bestMove, 1);
-		    	}
-		    	//hh.put(bestMove, hh.get)
-		    	
 		    	return new BestMove<M>(bestMove, alpha);
 			}
 		}

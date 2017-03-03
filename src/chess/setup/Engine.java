@@ -21,7 +21,7 @@ public class Engine {
 	 */
 	
 	private Searcher <ArrayMove, ArrayBoard>
-	    searcher = new JamboreeSearcher<ArrayMove,ArrayBoard>();
+	    searcher = new DeepeningJamboree<ArrayMove,ArrayBoard>();
 	
 	public Engine(int time, int inc) {
         searcher.setDepth(7);
