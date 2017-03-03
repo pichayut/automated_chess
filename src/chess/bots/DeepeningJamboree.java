@@ -28,12 +28,24 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     public static <M extends Move<M>> int compare(M m1, M m2) {
     	int tmp = Boolean.compare(m2.isCapture(), m1.isCapture());
-    	if(tmp != 0) return tmp;
-    	Random rt = new Random();
-    	return rt.nextInt(2) == 0 ? -1 : 1;
+    	//if(tmp != 0) return tmp;
+    	//return makeRandom();
+    	return tmp;
     }
     
-    static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
+    /*private static int makeRandom() {
+    	Random rt = new Random();
+    	int r =  rt.nextInt(3);
+    	if(r == 0) {
+    		return -1;
+    	} else if (r == 1){
+    		return 1;
+    	} else {
+    		return 0;
+    	}
+	}*/
+
+	static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
     	List<M> moves;
     	M move;
     	B board;
