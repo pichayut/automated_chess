@@ -3,6 +3,7 @@ package chess.bots;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
@@ -26,7 +27,10 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     }
     
     public static <M extends Move<M>> int compare(M m1, M m2) {
-    	return Boolean.compare(m2.isCapture(), m1.isCapture());
+    	int tmp = Boolean.compare(m2.isCapture(), m1.isCapture());
+    	if(tmp != 0) return tmp;
+    	Random rt = new Random();
+    	return rt.nextInt(2) == 0 ? -1 : 1;
     }
     
     static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
