@@ -1,6 +1,7 @@
 package chess.bots;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -21,6 +22,10 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
         /* Calculate the best move */
     	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
         return bestMove.move;
+    }
+    
+    public static <M extends Move<M>> int compare(M m1, M m2) {
+    	return Boolean.compare(m2.isCapture(), m1.isCapture());
     }
     
     static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
@@ -64,6 +69,8 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
+		    		
+		    		Collections.sort(this.moves, JamboreeSearcher::compare);
 		    	}
 				
 				if(this.depth <= this.cutoff || this.moves.size() == 0) {
@@ -119,6 +126,8 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				if(this.moves == null) {
 		    		this.moves = this.board.generateMoves();
 		    		this.r = this.moves.size();
+		    		
+		    		Collections.sort(this.moves, JamboreeSearcher::compare);
 		    	}
 				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
 		    	for (int i = st; i < ed - 1; i++) {
