@@ -17,6 +17,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	private static ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; // 0.4375
     private static final int DIVIDE_CUTOFF = 2;
+    private static final double FACTION = 0.65;
     private static long startTime;
     
     public M getBestMove(B board, int myTime, int opTime) {
@@ -131,7 +132,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		    		Collections.sort(this.moves, JamboreeSearcher::compare);
 		    	}
 				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
-				double mid = st + 0.8 * (ed - st) / 2;
+				double mid = st + FACTION * (ed - st) / 2;
 		    	for (int i = st; i < ed - 1; i++) {
 		    		//board.applyMove(this.moves.get(i));
 		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), (i < mid) ? this.depth - 1 : this.depth - 2, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
