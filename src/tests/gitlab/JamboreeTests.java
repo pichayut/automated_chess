@@ -5,6 +5,7 @@ import chess.board.ArrayMove;
 import chess.game.SimpleEvaluator;
 import cse332.chess.interfaces.Move;
 import cse332.chess.interfaces.Searcher;
+import chess.bots.DeepeningJamboree;
 import chess.bots.JamboreeSearcher;
 
 import tests.TestsUtility;
@@ -13,7 +14,7 @@ import tests.gitlab.TestingInputs;
 public class JamboreeTests extends SearcherTests {
 
     public static void main(String[] args) { new JamboreeTests().run(); }
-    public static void init() { STUDENT = new JamboreeSearcher<ArrayMove, ArrayBoard>(); }
+    public static void init() { STUDENT = new DeepeningJamboree<ArrayMove, ArrayBoard>(); }
 
 	
 	@Override
@@ -32,10 +33,10 @@ public class JamboreeTests extends SearcherTests {
         test("depth5", TestingInputs.FENS_TO_TEST.length);
         long endTime = System.currentTimeMillis();
         System.out.println(endTime - startTime);
-        //startTime = System.currentTimeMillis();
-        //test("depth6", TestingInputs.FENS_TO_TEST.length);
-        //endTime = System.currentTimeMillis();
-        //System.out.println(endTime - startTime);
+        startTime = System.currentTimeMillis();
+        test("depth6", TestingInputs.FENS_TO_TEST.length);
+        endTime = System.currentTimeMillis();
+        System.out.println(endTime - startTime);
         
 		finish();
 	} 

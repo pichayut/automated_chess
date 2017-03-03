@@ -18,7 +18,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	private static ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
-    private static final double FACTION = 0.55; //0.65;
+    private static final double FACTION = 1; //0.65;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
