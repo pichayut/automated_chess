@@ -3,6 +3,7 @@ package chess.bots;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
@@ -17,7 +18,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	private static ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
-    private static final double FACTION = 0.65; //0.65;
+    private static final double FACTION = 1; //0.65;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
@@ -26,10 +27,25 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     }
     
     public static <M extends Move<M>> int compare(M m1, M m2) {
-    	return Boolean.compare(m2.isCapture(), m1.isCapture());
+    	int tmp = Boolean.compare(m2.isCapture(), m1.isCapture());
+    	//if(tmp != 0) return tmp;
+    	//return makeRandom();
+    	return tmp;
     }
     
-    static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
+    /*private static int makeRandom() {
+    	Random rt = new Random();
+    	int r =  rt.nextInt(3);
+    	if(r == 0) {
+    		return -1;
+    	} else if (r == 1){
+    		return 1;
+    	} else {
+    		return 0;
+    	}
+	}*/
+
+	static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
     	List<M> moves;
     	M move;
     	B board;
