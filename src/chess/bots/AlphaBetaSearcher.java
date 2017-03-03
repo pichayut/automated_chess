@@ -13,7 +13,7 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
         return alphaBeta(this.evaluator, board, ply, null, -this.evaluator.infty(), this.evaluator.infty()).move;
     }
 
-    static <M extends Move<M>, B extends Board<M, B>> BestMove<M> alphaBeta(Evaluator<B> evaluator, B board, int depth, List<M> moves, int alpha, int beta) {
+    public static <M extends Move<M>, B extends Board<M, B>> BestMove<M> alphaBeta(Evaluator<B> evaluator, B board, int depth, List<M> moves, int alpha, int beta) {
     	if(depth == 0) {
     		return new BestMove<M>(evaluator.eval(board));
     	}
