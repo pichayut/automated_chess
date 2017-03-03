@@ -131,7 +131,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		    		Collections.sort(this.moves, JamboreeSearcher::compare);
 		    	}
 				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
-				int mid = st + (ed - st) / 2;
+				double mid = st + 0.8 * (ed - st) / 2;
 		    	for (int i = st; i < ed - 1; i++) {
 		    		//board.applyMove(this.moves.get(i));
 		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), (i < mid) ? this.depth - 1 : this.depth - 2, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
