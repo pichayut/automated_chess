@@ -128,7 +128,7 @@ Plot your results and discuss anything surprising about your results here.
 
 |      Algorithm     | Early Game | Mid Game | End Game |
 | :----------------: |:----------:|:--------:|:--------:|
-|       Minimax      |            |          |          |
+|       Minimax      |            |   heh       |          |
 |  Parallel Minimax  |            |          |          |
 |      Alphabeta     |            |          |          |
 |      Jamboree      |            |          |          |
