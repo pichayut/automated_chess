@@ -15,6 +15,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	
 	private static final ForkJoinPool POOL = new ForkJoinPool();
 	private static final int DIVIDE_CUTOFF = 4;
+	private static int count = 0;
 	
 	static class GetBestMoveTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
 		int divideCutoff;
@@ -34,6 +35,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			this.depth = depth;
 			this.l = l;
 			this.e = e;
+			count++;
 		}
 		
 		public int size() {
@@ -88,5 +90,9 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
     public M getBestMove(B board, int myTime, int opTime) {
     	List<M> moves = board.generateMoves();
     	return POOL.invoke(new GetBestMoveTask<M, B>(moves, board, 0, moves.size(), this.evaluator, ply, cutoff, DIVIDE_CUTOFF)).move;
+    }
+    
+    public int getCount() {
+    	return this.count;
     }
 }

@@ -16,27 +16,27 @@ public class Testing_Writeup {
     private ArrayBoard board;
     
     public static void main(String[] args) throws FileNotFoundException {
-    	/*
-    	PrintStream out = new PrintStream(new File("./experiment/boards.txt"));
-        game.play(out, STARTING_POSITION);
-        out.close();
-        */
-        
     	Testing_Writeup game = new Testing_Writeup();
-                
+    	
+    	if (false) {
+	    	PrintStream out = new PrintStream(new File("./experiment/boards.txt"));
+	        game.play(out, STARTING_POSITION);
+	        out.close();
+    	}
+                               
         Scanner in = new Scanner(new File("./experiment/boards.txt"));
         ArrayBoard board= null;
         int count = 0;
         while(in.hasNextLine()) {
         	game.play(System.out, in.nextLine());
-        	count += ((SimpleSearcher) whitePlayer).getCount();
+        	count += ((JamboreeSearcher) whitePlayer).getCount();
         }
         System.out.println(count);
     }
 
     public Testing_Writeup() {
-        setupWhitePlayer(new SimpleSearcher<ArrayMove, ArrayBoard>(), 3, 3);
-        setupBlackPlayer(new SimpleSearcher<ArrayMove, ArrayBoard>(), 4, 4);
+        setupWhitePlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 1, 3);
+        setupBlackPlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 4, 4);
     }
     
     public void play(PrintStream out, String currentBoard) {
