@@ -8,12 +8,14 @@ public class SimpleTimer implements Timer {
     private int increment;
     private long startTime;
     private int allocated;
+    private int cons;
 
     private boolean noTimeup = false;
 
     public SimpleTimer(int initialTime, int increment) {
         this.initialTime = initialTime;
         this.increment = increment;
+        this.cons = 30;
     }
 
     public void start(int myTime, int opTime) {
@@ -24,6 +26,10 @@ public class SimpleTimer implements Timer {
     public void start(int howManyMillis) {
         startTime = System.currentTimeMillis();
         allocated = howManyMillis;
+    }
+    
+    public void setNewCons(int cons) {
+    	this.cons = cons;
     }
     
     public long stop() {
@@ -51,7 +57,7 @@ public class SimpleTimer implements Timer {
      * increment, to the current move.
      */
     private int allocateTime(int timeLeft, int opTimeLeft) {
-        double t = .9 * increment + timeLeft / 20.0; // original = 30.0
+        double t = .9 * increment + timeLeft / 30.0;
         if (t > timeLeft)
             t = .9 * timeLeft;
         return (int) t;
