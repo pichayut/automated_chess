@@ -20,7 +20,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
-    private static int timeAllowPerMove = 10000;
+    private static int timeAllowPerMove = 9000;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
@@ -31,9 +31,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     }
     
     public static <M extends Move<M>> int compare(M m1, M m2) {
-    	int tmp = Boolean.compare(m2.isCapture(), m1.isCapture());
-    	if(tmp != 0) return tmp;
-    	return Boolean.compare(m2.isPromotion(), m1.isPromotion());
+    	return Boolean.compare(m2.isCapture(), m1.isCapture());
     }
     
     /*private static int makeRandom() {
