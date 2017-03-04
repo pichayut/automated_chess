@@ -1,8 +1,7 @@
 package chess.bots;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
@@ -10,6 +9,7 @@ import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
 import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
+import chess.board.ArrayMove;
 import chess.game.SimpleTimer;
 
 public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
@@ -20,27 +20,35 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
-    private static int timeAllowPerMove = 15000;
+    private static final int timeAllowPerMove = 15000;
+    private static final boolean limitTime = false;
+    
+    private static Map<String, List<Tuple<ArrayMove>>> keepMove;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
     	timer = new SimpleTimer(0, 0);
-    	
-    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
     	timer.start(myTime, opTime);
+    	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
+    	BestMove<M> bestMove = POOL.invoke(new DeepeningSubTask<M, B>(this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false));
     	int depth = 2;
     	while(depth <= ply) {
-    		BestMove<M> tmp = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
-    		if(tmp.value > bestMove.value) {
-    			bestMove = tmp;
-    		}
+    		timer.start(myTime, opTime);
+    		//sortAll();
+    		bestMove = POOL.invoke(new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false));
     		depth++;
     	}
     	return bestMove.move;
     }
     
-    public static <M extends Move<M>> int compare(M m1, M m2) {
-    	return Boolean.compare(m2.isCapture(), m1.isCapture());
+    private void sortAll() {
+		for(List<Tuple<ArrayMove>> lst : keepMove.values()) {
+			Collections.sort(lst);
+		}
+	}
+
+	public static <M extends Move<M>> int compareCapture(Tuple<M> m1, Tuple<M> m2) {
+    	return Boolean.compare(m2.getMove().isCapture(), m1.getMove().isCapture());
     }
     
     /*private static int makeRandom() {
@@ -55,29 +63,32 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	}
 	}*/
 
-	static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
-    	List<M> moves;
+	public static class DeepeningSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
+    	//List<M> moves;
+    	List<Tuple<ArrayMove>> tupleMoves;
     	M move;
     	B board;
     	Evaluator<B> e;
     	int depth, alpha, beta;
     	int cutoff, divideCutoff;
     	int l, r;
-    	boolean AlreadyHaveGoodAlphaBeta;
+    	boolean alreadyHaveGoodAlphaBeta, fromParallel;
     	
-    	public JamboreeSubTask(Evaluator<B> e, B board, M move, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean AlreadyHaveGoodAlphaBeta) {
+    	public DeepeningSubTask(Evaluator<B> e, B board, M move, int depth/*, List<M> moves,*/, List<Tuple<ArrayMove>> tupleMoves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean alreadyHaveGoodAlphaBeta, boolean fromParallel) {
     		this.e = e;
     		this.move = move;
+    		this.tupleMoves = tupleMoves;
     		this.board = board;
     		this.depth = depth;
-    		this.moves = moves;
+    		//this.moves = moves;
     		this.alpha = alpha;
     		this.beta = beta;
     		this.cutoff = cutoff;
     		this.l = l;
     		this.r = r;
     		this.divideCutoff = divideCutoff;
-    		this.AlreadyHaveGoodAlphaBeta = AlreadyHaveGoodAlphaBeta;
+    		this.alreadyHaveGoodAlphaBeta = alreadyHaveGoodAlphaBeta;
+    		this.fromParallel = fromParallel;
     	}
     	
     	public int size() {
@@ -85,42 +96,69 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		}
     	
 		protected BestMove<M> compute() {
-			if(timer.stop() >= timeAllowPerMove) return new BestMove(-this.e.infty());
+			// exceed time allowed per move
+			if(limitTime && timer.stop() >= timeAllowPerMove) {
+				return new BestMove<M>(-this.e.infty());
+			}
+			
 			M bestMove = null;
-			if(!AlreadyHaveGoodAlphaBeta) {
+			int indexBest = -1;
+			if(!alreadyHaveGoodAlphaBeta) {			// do sequential part
 				this.board = this.board.copy();
 				if(this.move != null) {
 					this.board.applyMove(this.move);
 					this.move = null;
 				}
 
-				if(this.moves == null) {
-		    		this.moves = this.board.generateMoves();
-		    		this.r = this.moves.size();
-		    		
-		    		Collections.sort(this.moves, DeepeningJamboree::compare);
+				if(this.tupleMoves == null) {
+					List<M> tmpMoves;
+					if(keepMove.containsKey(this.board.fen())) {
+						this.tupleMoves = keepMove.get(this.board.fen());
+						Collections.sort(this.tupleMoves);
+					} else {
+						tmpMoves = this.board.generateMoves();
+			    		this.tupleMoves = new ArrayList<Tuple<ArrayMove>>();
+			    		for(int i = 0; i < tmpMoves.size(); i++) {
+			    			this.tupleMoves.add(new Tuple<ArrayMove>((ArrayMove) tmpMoves.get(i), 0));
+			    		}
+			    		Collections.sort(this.tupleMoves, DeepeningJamboree::compareCapture);
+			    		keepMove.put(this.board.fen(), this.tupleMoves);
+					}
+					this.r = this.tupleMoves.size();
 		    	}
 				
-				if(this.depth <= this.cutoff || this.moves.size() == 0) {
-					return AlphaBetaSearcher.alphaBeta(this.e, this.board, this.depth, this.moves, this.alpha, this.beta);
+				if(this.depth <= this.cutoff || this.tupleMoves.size() == 0) {
+					List<M> tmpMoves = new ArrayList<M>();
+					for(int i = 0; i < this.tupleMoves.size(); i++) {
+						tmpMoves.add((M) this.tupleMoves.get(i).getMove());
+					}
+					return AlphaBetaSearcher.alphaBeta(this.e, this.board, this.depth, tmpMoves, this.alpha, this.beta);
 				}
 		    	for (int i = l; i < l + (int) (PERCENTAGE_SEQUENTIAL * this.size()); i++) {
-		    		M move = this.moves.get(i);
+		    		M move = (M) this.tupleMoves.get(i).getMove();
 		    		this.board.applyMove(move);
-		    		int value = new JamboreeSubTask<M, B>(this.e, this.board, null, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false).compute().negate().value;
+		    		int value = new DeepeningSubTask<M, B>(this.e, this.board, null, this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false, false).compute().negate().value;
 		    		this.board.undoMove();
 		    		if (value > alpha) {
 		    			alpha = value;
 		    			bestMove = move;
+		    			indexBest = i;
 		    		}
 		    		if (alpha >= beta) {
-		    			return new BestMove<M>(bestMove, alpha);
+		    			
+		    			// add HH value
+		    			if(indexBest != -1) {
+		    				this.tupleMoves.get(indexBest).increment(1 << depth);
+		    				//Collections.sort(this.tupleMoves);
+		    			}
+		    			
+		    			return new BestMove<M>(bestMove, alpha, indexBest);
 		    		}
 		    	}
 			}
 
 			int st, ed;
-			if(!AlreadyHaveGoodAlphaBeta) {
+			if(!alreadyHaveGoodAlphaBeta) {
 				st = l + (int) (PERCENTAGE_SEQUENTIAL * this.size());
 				ed = r;
 			} else {
@@ -129,21 +167,30 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 			}
 			
 			if(this.size() > this.divideCutoff) {
-				JamboreeSubTask<M, B> leftTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true);
-				JamboreeSubTask<M, B> rightTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true);
+				DeepeningSubTask<M, B> leftTask = new DeepeningSubTask<M, B>(e, board, this.move, depth, tupleMoves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true, true);
+				DeepeningSubTask<M, B> rightTask = new DeepeningSubTask<M, B>(e, board, this.move, depth, tupleMoves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true, true);
 				
 				leftTask.fork();
 				BestMove<M> answer = rightTask.compute();
 				if(answer.value > alpha) {
 					alpha = answer.value;
 					bestMove = answer.move;
+					indexBest = answer.indexBest;
 				}
 				BestMove<M> leftAnswer = leftTask.join();
 				if(leftAnswer.value > alpha) {
 					alpha = leftAnswer.value;
 					bestMove = leftAnswer.move;
+					indexBest = leftAnswer.indexBest;
 				}
-				return new BestMove<M>(bestMove, alpha);
+				if(!fromParallel) {
+					// add HH value
+	    			if(indexBest != -1) {
+	    				this.tupleMoves.get(indexBest).increment(1 << depth);
+	    				//Collections.sort(this.tupleMoves);
+	    			}
+				}
+				return new BestMove<M>(bestMove, alpha, indexBest);
 			} else {
 				//this.board = this.board.copy();
 				if(this.move != null) {
@@ -151,31 +198,49 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 					this.move = null;
 				}
 				
-				if(this.moves == null) {
-		    		this.moves = this.board.generateMoves();
-		    		this.r = this.moves.size();
-		    		
-		    		Collections.sort(this.moves, DeepeningJamboree::compare);
+				if(this.tupleMoves == null) {
+					List<M> tmpMoves;
+					if(keepMove.containsKey(this.board.fen())) {
+						this.tupleMoves = keepMove.get(this.board.fen());
+					} else {
+						tmpMoves = this.board.generateMoves();
+						this.tupleMoves = new ArrayList<Tuple<ArrayMove>>();
+			    		for(int i = 0; i < tmpMoves.size(); i++) {
+			    			this.tupleMoves.add(new Tuple<ArrayMove>((ArrayMove) tmpMoves.get(i), 0));
+			    		}
+			    		Collections.sort(this.tupleMoves, DeepeningJamboree::compareCapture);
+			    		keepMove.put(this.board.fen(), this.tupleMoves);
+					}
+					this.r = this.tupleMoves.size();
 		    	}
-				List<JamboreeSubTask<M, B>> taskList = new ArrayList<JamboreeSubTask<M, B>>();
+				
+				List<DeepeningSubTask<M, B>> taskList = new ArrayList<DeepeningSubTask<M, B>>();
 				double mid = st + FACTION * (ed - st) / 2;
 		    	for (int i = st; i < ed - 1; i++) {
 		    		//board.applyMove(this.moves.get(i));
-		    		taskList.add(new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(i), (i < mid) ? this.depth - 1 : this.depth - 2, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false));
+		    		taskList.add(new DeepeningSubTask<M, B>(this.e, this.board, (M) this.tupleMoves.get(i).getMove(), (i < mid) ? this.depth - 1 : this.depth - 2, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false, false));
 		    		taskList.get(i - st).fork();
 		    		//board.undoMove();
 		    	}
 		    	
 		    	// do one work yourself
 		    	//board.applyMove(this.moves.get(ed - 1));
-		    	JamboreeSubTask<M, B> current = new JamboreeSubTask<M, B>(this.e, this.board, this.moves.get(ed - 1), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false);
+		    	DeepeningSubTask<M, B> current = new DeepeningSubTask<M, B>(this.e, this.board, (M) tupleMoves.get(ed - 1).getMove(), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false, false);
 		    	int value = current.compute().negate().value;
 		    	if (value > alpha) {
 		    		alpha = value;
-		    		bestMove = this.moves.get(ed - 1);
+		    		bestMove = (M) this.tupleMoves.get(ed - 1).getMove();
+		    		indexBest = ed - 1;
 		    	}
 		    	if (alpha >= beta) { 
-		    		return new BestMove<M>(bestMove, alpha);
+		    		
+		    		// add HH value
+	    			if(indexBest != -1) {
+	    				this.tupleMoves.get(indexBest).increment(1 << depth);
+	    				//Collections.sort(this.tupleMoves);
+	    			}
+	    			
+		    		return new BestMove<M>(bestMove, alpha, indexBest);
 		    	}
 		    	//---------------------
 		    	
@@ -183,13 +248,28 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    		value = taskList.get(i).join().negate().value;
 		    		if (value > alpha) {
 			    		alpha = value;
-			    		bestMove = moves.get(i + st);
+			    		bestMove = (M) this.tupleMoves.get(i + st).getMove();
+			    		indexBest = i + st;
 			    	}
 			    	if (alpha >= beta) { 
-			    		return new BestMove<M>(bestMove, alpha);
+			    		
+			    		// add HH value
+		    			if(indexBest != -1) {
+		    				this.tupleMoves.get(indexBest).increment(1 << depth);
+		    				//Collections.sort(this.tupleMoves);
+		    			}
+			    		
+			    		return new BestMove<M>(bestMove, alpha, indexBest);
 			    	}
 		    	}
-		    	return new BestMove<M>(bestMove, alpha);
+		    	
+		    	// add HH value
+    			if(indexBest != -1) {
+    				this.tupleMoves.get(indexBest).increment(1 << depth);
+    				//Collections.sort(this.tupleMoves);
+    			}
+		    	
+		    	return new BestMove<M>(bestMove, alpha, indexBest);
 			}
 		}
     }

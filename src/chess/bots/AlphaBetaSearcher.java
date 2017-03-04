@@ -1,5 +1,6 @@
 package chess.bots;
 
+import java.util.Collections;
 import java.util.List;
 
 import cse332.chess.interfaces.AbstractSearcher;
@@ -12,6 +13,10 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
         /* Calculate the best move */
         return alphaBeta(this.evaluator, board, ply, null, -this.evaluator.infty(), this.evaluator.infty()).move;
     }
+    
+    public static <M extends Move<M>> int compareCapture(M m1, M m2) {
+    	return Boolean.compare(m2.isCapture(), m1.isCapture());
+    }
 
     static <M extends Move<M>, B extends Board<M, B>> BestMove<M> alphaBeta(Evaluator<B> evaluator, B board, int depth, List<M> moves, int alpha, int beta) {
     	if(depth == 0) {
@@ -20,6 +25,8 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	
     	if(moves == null) {
     		moves = board.generateMoves();
+    		// add ordering
+    		Collections.sort(moves, AlphaBetaSearcher::compareCapture);
     	}
     	
     	if(moves.isEmpty()) {

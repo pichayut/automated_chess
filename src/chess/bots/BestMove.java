@@ -8,6 +8,7 @@ package chess.bots;
 public class BestMove<M> {
     public M move;
     public int value;
+    public int indexBest;	// for DeepeningJamboree
     
     public BestMove(int value) {
         this.value = value;
@@ -16,6 +17,12 @@ public class BestMove<M> {
     public BestMove(M move, int value) {
         this.move = move;
         this.value = value;
+    }
+    
+    public BestMove(M move, int value, int indexBest) {
+        this.move = move;
+        this.value = value;
+        this.indexBest = indexBest;
     }
     
     public BestMove<M> negate() {
