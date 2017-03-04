@@ -21,8 +21,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
+    
+    // Limit time per move
     private static final int timeAllowPerMove = 7000;
     private static final boolean limitTime = true;
+    
+    // how many depth allowed to check for consistent moves
+	private static final int CONS = 3;
     private static Random rt = new Random();
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
@@ -45,7 +50,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     		} else {
     			consistent = 0;
     		}
-    		if(consistent == 2 && depth == ply - 1) {
+    		if(consistent == CONS && depth == ply - 1) {
     			break;
     		}
     		depth++;
