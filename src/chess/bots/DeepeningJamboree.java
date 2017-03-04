@@ -21,7 +21,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
-    private static final int timeAllowPerMove = 10000;
+    private static final int timeAllowPerMove = 7000;
     private static final boolean limitTime = true;
     private static Random rt = new Random();
     
