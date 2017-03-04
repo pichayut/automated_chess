@@ -10,6 +10,7 @@ import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
 import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
+import chess.game.SimpleTimer;
 
 public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
@@ -18,12 +19,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
+    private static SimpleTimer timer;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	int d = ply;
-    	if(myTime < 30000) d--;
-    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, d, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
+    	timer = new SimpleTimer(0, 0);
+    	timer.start(myTime, opTime);
+    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
         return bestMove.move;
     }
     
@@ -75,6 +77,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		}
     	
 		protected BestMove<M> compute() {
+			if(timer.stop() >= 6000) return new BestMove(this.e.infty());
 			M bestMove = null;
 			if(!AlreadyHaveGoodAlphaBeta) {
 				this.board = this.board.copy();
