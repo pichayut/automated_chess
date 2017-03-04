@@ -34,7 +34,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	int depth = 2;
     	while(depth <= ply) {
     		timer.start(myTime, opTime);
-    		//sortAll();
+    		sortAll();
     		bestMove = new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false).compute();
     		depth++;
     	}
@@ -114,7 +114,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 					List<M> tmpMoves;
 					if(keepMove.containsKey(this.board.fen())) {
 						this.tupleMoves = keepMove.get(this.board.fen());
-						Collections.sort(this.tupleMoves);
+						//Collections.sort(this.tupleMoves);
 					} else {
 						tmpMoves = this.board.generateMoves();
 			    		this.tupleMoves = new ArrayList<Tuple<ArrayMove>>();
@@ -202,6 +202,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 					List<M> tmpMoves;
 					if(keepMove.containsKey(this.board.fen())) {
 						this.tupleMoves = keepMove.get(this.board.fen());
+						//Collections.sort(this.tupleMoves);
 					} else {
 						tmpMoves = this.board.generateMoves();
 						this.tupleMoves = new ArrayList<Tuple<ArrayMove>>();
