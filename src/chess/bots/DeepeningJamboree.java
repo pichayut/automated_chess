@@ -30,12 +30,12 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	timer = new SimpleTimer(0, 0);
     	timer.start(myTime, opTime);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
-    	BestMove<M> bestMove = POOL.invoke(new DeepeningSubTask<M, B>(this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false));
+    	BestMove<M> bestMove = new DeepeningSubTask<M, B>(this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false).compute();
     	int depth = 2;
     	while(depth <= ply) {
     		timer.start(myTime, opTime);
     		//sortAll();
-    		bestMove = POOL.invoke(new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false));
+    		bestMove = new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false).compute();
     		depth++;
     	}
     	return bestMove.move;
