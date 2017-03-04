@@ -77,7 +77,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		}
     	
 		protected BestMove<M> compute() {
-			if(timer.stop() >= 6000) return new BestMove(this.e.infty());
+			if(timer.stop() >= 6000) return new BestMove(-this.e.infty());
 			M bestMove = null;
 			if(!AlreadyHaveGoodAlphaBeta) {
 				this.board = this.board.copy();
