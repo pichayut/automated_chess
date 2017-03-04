@@ -27,9 +27,8 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     public static <M extends Move<M>> int compare(M m1, M m2) {
     	int tmp = Boolean.compare(m2.isCapture(), m1.isCapture());
-    	//if(tmp != 0) return tmp;
-    	//return makeRandom();
-    	return tmp;
+    	if(tmp != 0) return tmp;
+    	return Boolean.compare(m2.isPromotion(), m1.isPromotion());
     }
     
     /*private static int makeRandom() {
