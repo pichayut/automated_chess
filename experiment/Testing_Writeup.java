@@ -16,11 +16,14 @@ public class Testing_Writeup {
     private ArrayBoard board;
     
     public static void main(String[] args) throws FileNotFoundException {
+    	/*
     	PrintStream out = new PrintStream(new File("./experiment/boards.txt"));
-    	Testing_Writeup game = new Testing_Writeup();
         game.play(out, STARTING_POSITION);
         out.close();
+        */
         
+    	Testing_Writeup game = new Testing_Writeup();
+                
         Scanner in = new Scanner(new File("./experiment/boards.txt"));
         ArrayBoard board= null;
         int count = 0;
@@ -43,12 +46,12 @@ public class Testing_Writeup {
        int turn = 0;
        
        /* Note that this code does NOT check for stalemate... */
-       while (!board.inCheck() || board.generateMoves().size() > 0) {
+       //while (!board.inCheck() || board.generateMoves().size() > 0) {
            currentPlayer = currentPlayer.equals(this.whitePlayer) ? this.blackPlayer : this.whitePlayer;
            out.println(board.fen());
            this.board.applyMove(currentPlayer.getBestMove(board, 1000, 1000));
            turn++;
-       }
+       //}
     }
     
     public Searcher<ArrayMove, ArrayBoard> setupPlayer(Searcher<ArrayMove, ArrayBoard> searcher, int depth, int cutoff) {
