@@ -24,11 +24,7 @@ public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	}
     	
     	if(moves.isEmpty()) {
-    		if(board.inCheck()) {
-    			return new BestMove<M>(-evaluator.mate() - depth);
-    		} else {
-    			return new BestMove<M>(-evaluator.stalemate());
-    		}
+    		return new BestMove<M>(evaluator.eval(board));
     	} 
     	
     	M bestMove = null;
