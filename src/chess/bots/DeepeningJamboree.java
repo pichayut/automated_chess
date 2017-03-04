@@ -133,11 +133,11 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    	}
 				
 				if(this.depth <= this.cutoff || this.tupleMoves.size() == 0) {
-					List<M> tmpMoves = new ArrayList<M>();
+					/*List<M> tmpMoves = new ArrayList<M>();
 					for(int i = 0; i < this.tupleMoves.size(); i++) {
 						tmpMoves.add((M) this.tupleMoves.get(i).getMove());
-					}
-					return AlphaBetaSearcher.alphaBeta(this.e, this.board, this.depth, tmpMoves, this.alpha, this.beta);
+					}*/
+					return DeepeningSequential.alphaBeta(keepMove, this.e, this.board, this.depth, this.tupleMoves, this.alpha, this.beta);
 				}
 		    	for (int i = l; i < l + (int) (PERCENTAGE_SEQUENTIAL * this.size()); i++) {
 		    		M move = (M) this.tupleMoves.get(i).getMove();
