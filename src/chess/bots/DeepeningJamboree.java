@@ -22,7 +22,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
     private static final int timeAllowPerMove = 7000;
-    private static final boolean limitTime = true;
+    private static final boolean limitTime = false;
     private static Random rt = new Random();
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
@@ -36,7 +36,6 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	int depth = 2;
     	while(depth <= ply) {
     		sortAll();
-    		timer.start(myTime, opTime);
     		bestMove = new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     		depth++;
     	}
@@ -172,7 +171,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 				ed = r;
 			}
 			
-			if(this.size() > this.divideCutoff) {
+			if(ed - st > this.divideCutoff) {
 				DeepeningSubTask<M, B> leftTask = new DeepeningSubTask<M, B>(e, board, this.move, depth, tupleMoves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true, true, false);
 				DeepeningSubTask<M, B> rightTask = new DeepeningSubTask<M, B>(e, board, this.move, depth, tupleMoves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true, true, false);
 				
