@@ -1,7 +1,6 @@
 package chess.bots;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -14,14 +13,13 @@ import cse332.chess.interfaces.Move;
 public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
-	private static ForkJoinPool POOL = new ForkJoinPool();
+	private static final ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 4;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
-        return bestMove.move;
+    	return POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false)).move;
     }
     
     static class JamboreeSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
@@ -32,7 +30,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	int depth, alpha, beta;
     	int cutoff, divideCutoff;
     	int l, r;
-    	boolean AlreadyHaveGoodAlphaBeta;
+    	boolean alreadyHaveGoodAlphaBeta;
     	
     	public JamboreeSubTask(Evaluator<B> e, B board, M move, int depth, List<M> moves, int l, int r, int alpha, int beta, int cutoff, int divideCutoff, boolean AlreadyHaveGoodAlphaBeta) {
     		this.e = e;
@@ -46,7 +44,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     		this.l = l;
     		this.r = r;
     		this.divideCutoff = divideCutoff;
-    		this.AlreadyHaveGoodAlphaBeta = AlreadyHaveGoodAlphaBeta;
+    		this.alreadyHaveGoodAlphaBeta = AlreadyHaveGoodAlphaBeta;
     	}
     	
     	public int size() {
@@ -55,7 +53,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     	
 		protected BestMove<M> compute() {
 			M bestMove = null;
-			if(!AlreadyHaveGoodAlphaBeta) {
+			if(!alreadyHaveGoodAlphaBeta) {
 				this.board = this.board.copy();
 				if(this.move != null) {
 					this.board.applyMove(this.move);
@@ -86,7 +84,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			}
 
 			int st, ed;
-			if(!AlreadyHaveGoodAlphaBeta) {
+			if(!alreadyHaveGoodAlphaBeta) {
 				st = l + (int) (PERCENTAGE_SEQUENTIAL * this.size());
 				ed = r;
 			} else {

@@ -14,7 +14,7 @@ import tests.gitlab.TestingInputs;
 public class JamboreeTests extends SearcherTests {
 
     public static void main(String[] args) { new JamboreeTests().run(); }
-    public static void init() { STUDENT = new DeepeningJamboree<ArrayMove, ArrayBoard>(); }
+    public static void init() { STUDENT = new JamboreeSearcher<ArrayMove, ArrayBoard>(); }
 
 	
 	@Override
