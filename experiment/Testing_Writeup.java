@@ -5,12 +5,11 @@ import java.util.Scanner;
 
 import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
-import chess.bots.SimpleSearcher;
 import chess.game.SimpleEvaluator;
 import cse332.chess.interfaces.Searcher;
 
 public class Testing_Writeup {
-	public Searcher<ArrayMove, ArrayBoard> whitePlayer;
+	public static Searcher<ArrayMove, ArrayBoard> whitePlayer;
     public Searcher<ArrayMove, ArrayBoard> blackPlayer;
     public static final String STARTING_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     
@@ -24,9 +23,12 @@ public class Testing_Writeup {
         
         Scanner in = new Scanner(new File("./experiment/boards.txt"));
         ArrayBoard board= null;
+        int count = 0;
         while(in.hasNextLine()) {
         	game.play(System.out, in.nextLine());
+        	count += ((SimpleSearcher) whitePlayer).getCount();
         }
+        System.out.println(count);
     }
 
     public Testing_Writeup() {
