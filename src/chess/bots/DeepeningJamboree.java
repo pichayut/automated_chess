@@ -36,7 +36,11 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	int depth = 2;
     	while(depth <= ply) {
     		sortAll();
-    		bestMove = new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
+    		BestMove<M> tmp;
+    		tmp = new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
+    		if(tmp.value > bestMove.value) {
+    			bestMove = tmp;
+    		}
     		depth++;
     	}
     	return bestMove.move;

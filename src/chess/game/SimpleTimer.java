@@ -51,7 +51,7 @@ public class SimpleTimer implements Timer {
      * increment, to the current move.
      */
     private int allocateTime(int timeLeft, int opTimeLeft) {
-        double t = .9 * increment + timeLeft / 30.0;
+        double t = .9 * increment + timeLeft / 20.0; // original = 30.0
         if (t > timeLeft)
             t = .9 * timeLeft;
         return (int) t;
