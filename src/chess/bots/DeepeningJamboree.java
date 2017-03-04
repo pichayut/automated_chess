@@ -29,7 +29,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	((SimpleTimer)timer).setNewCons(30 - board.plyCount() / 2);
+    	((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     	timer.start(myTime, opTime);
