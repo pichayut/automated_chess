@@ -26,7 +26,7 @@ public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	}
 
     static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth, List<M> moves) {
-		count ++;
+		count++;
     	if(depth == 0) {
     		return new BestMove<M>(evaluator.eval(board));
     	}
