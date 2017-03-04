@@ -3,34 +3,36 @@
 
 ## Project Enjoyment ##
 - How Was Your Partnership?
-  <pre>TODO</pre>
+  <pre>"Fantastic," Ter. "Exceptional partnership and friendship <3," Jacob. It was a lot of fun working as a group for the whole quarter.</pre>
   
 - What was your favorite part of the project?
-  <pre>TODO</pre>
+  <pre>Watching the bots actually play each other. It was very interesting to see them figure out the best moves to take.</pre>
 
 - What was your least favorite part of the project?
-  <pre>TODO</pre>
+  <pre>The minimax portion since it was decently rudimentary and a little boring.</pre>
 
 - How could the project be improved?
-  <pre>TODO</pre>
+  <pre>After P2 was finished grading, gitlab was extremely slow and would just pend for hours due to the heavy load from P2 running,
+  so it would have been nice to know about that before hand so that we could have acted accordingly.</pre>
 
 - Did you enjoy the project?
-  <pre>TODO</pre>
+  <pre>Yes, we did.</pre>
     
 -----
 
 ## The Chess Server ##
 - When you faced Clamps, what did the code you used do?  Was it just your jamboree?  Did you do something fancier?
-  <pre>TODO</pre>
+  <pre>It was an implementation of JamboreeSearcher with move ordering added.</pre>
 
 - Did you enjoy watching your bot play on the server?  Is your bot better at chess than you are?
-  <pre>TODO</pre>
+  <pre>Yes, it was very neat to see it actually play out and work. The bot is much better at chess than we are since you know, it's a computer
+  and can think of many, many, many moves ahead while we are just mortal humans.</pre>
 
 - Did your bot compete with anyone else in the class?  Did you win?
-  <pre>TODO</pre>
+  <pre>No.</pre>
 
 - Did you do any Above and Beyond?  Describe exactly what you implemented.
-  <pre>TODO</pre>
+  <pre>Not yet, but we might try and beat the other bots.</pre>
 
 ## Experiments ##
 
@@ -40,9 +42,11 @@
 Suppose your bot goes 3-ply deep.  How many game tree nodes do you think
 it explores (we're looking for an order of magnitude) if:
  - ...you're using minimax?
-    <pre>TODO</pre>
+    <pre>The max moves for each piece are Pawn:2, Rook:14, Knight:8, Bishop:14, King:8, and Queen:28, so assuming that each piece can do the
+    max number of moves than that is 124 moves total. We then go 3-ply deep so that is 124 moves for each depth so that is approximately
+    2 million game tree nodes explored.</pre>
  - ...you're using alphabeta?
-    <pre>TODO</pre>
+    <pre>We suppose that alphabeta explores about half of the nodes so we think it will explore around 1 million game tree nodes.</pre>
 
 #### Results ####
 Run an experiment to determine the actual answers for the above.  To run
