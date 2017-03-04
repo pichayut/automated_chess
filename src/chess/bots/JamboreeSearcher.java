@@ -94,7 +94,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				ed = r;
 			}
 			
-			if(this.size() > this.divideCutoff) {
+			if(ed - st > this.divideCutoff) {
 				JamboreeSubTask<M, B> leftTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st, st + (ed - st) / 2, alpha, beta, cutoff, divideCutoff, true);
 				JamboreeSubTask<M, B> rightTask = new JamboreeSubTask<M, B>(e, board, this.move, depth, moves, st + (ed - st) / 2, ed, alpha, beta, cutoff, divideCutoff, true);
 				
