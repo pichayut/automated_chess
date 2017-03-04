@@ -25,11 +25,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static Random rt = new Random();
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
+    private static Map<String, BestMove<ArrayMove>> keepBestMove;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
     	((SimpleTimer)timer).setNewCons(30 - board.plyCount() / 2);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
+    	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     	timer.start(myTime, opTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
@@ -107,7 +109,11 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		protected BestMove<M> compute() {
 			// exceed time allowed per move
 			if(limitTime && timer.timeup()) {
-				return new BestMove<M>(-this.e.infty());
+				if(!keepBestMove.containsKey(this.board.fen())) {
+					return new BestMove<M>(-this.e.infty());
+				} else {
+					return (BestMove<M>) keepBestMove.get(this.board.fen());
+				}
 			}
 			
 			M bestMove = null;
@@ -162,7 +168,9 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    				//Collections.sort(this.tupleMoves);
 		    			}
 		    			
-		    			return new BestMove<M>(bestMove, alpha, indexBest);
+		    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
+		    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
+		    			return best;
 		    		}
 		    	}
 			}
@@ -200,7 +208,9 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	    				//Collections.sort(this.tupleMoves);
 	    			}
 				}
-				return new BestMove<M>(bestMove, alpha, indexBest);
+				BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
+    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
+    			return best;
 			} else {
 				//this.board = this.board.copy();
 				if(this.move != null) {
@@ -252,7 +262,9 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	    				//Collections.sort(this.tupleMoves);
 	    			}
 	    			
-		    		return new BestMove<M>(bestMove, alpha, indexBest);
+	    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
+	    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
+	    			return best;
 		    	}
 		    	//---------------------
 		    	
@@ -271,7 +283,9 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    				//Collections.sort(this.tupleMoves);
 		    			}
 			    		
-			    		return new BestMove<M>(bestMove, alpha, indexBest);
+		    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
+		    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
+		    			return best;
 			    	}
 		    	}
 		    	
@@ -281,7 +295,9 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     				//Collections.sort(this.tupleMoves);
     			}
 		    	
-		    	return new BestMove<M>(bestMove, alpha, indexBest);
+    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
+    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
+    			return best;
 			}
 		}
     }
