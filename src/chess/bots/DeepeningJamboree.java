@@ -20,14 +20,23 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
-    private static int timeAllowPerMove = 9000;
+    private static int timeAllowPerMove = 15000;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
     	timer = new SimpleTimer(0, 0);
+    	
+    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
     	timer.start(myTime, opTime);
-    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
-        return bestMove.move;
+    	int depth = 2;
+    	while(depth <= ply) {
+    		BestMove<M> tmp = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
+    		if(tmp.value > bestMove.value) {
+    			bestMove = tmp;
+    		}
+    		depth++;
+    	}
+    	return bestMove.move;
     }
     
     public static <M extends Move<M>> int compare(M m1, M m2) {
