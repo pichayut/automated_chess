@@ -25,7 +25,7 @@ public class Engine {
 	
 	public Engine(int time, int inc) {
         searcher.setDepth(7);
-        searcher.setCutoff(3);
+        searcher.setCutoff(0);
 
         searcher.setEvaluator(new SimpleEvaluator());
         searcher.setTimer(new SimpleTimer(time, inc));
