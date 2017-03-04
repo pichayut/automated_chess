@@ -20,8 +20,9 @@ public class TrafficSearcher<M extends Move<M>, B extends Board<M, B>> extends
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	BestMove<M> bestMove = POOL.invoke(new TrafficSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
-        return bestMove.move;
+    	//BestMove<M> bestMove = POOL.invoke(new TrafficSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
+        // ClassCastException for jamboree search method
+    	return AlphaBetaSearcher.alphaBeta(this.evaluator, board, ply, null, -this.evaluator.infty(), this.evaluator.infty()).move;
     }
     
     static class TrafficSubTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
