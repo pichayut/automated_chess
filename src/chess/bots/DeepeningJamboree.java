@@ -21,8 +21,8 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
-    private static final int timeAllowPerMove = 7000;
-    private static final boolean limitTime = false;
+    private static int timeAllowPerMove = 20000;
+    private static final boolean limitTime = true;
     private static Random rt = new Random();
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
@@ -101,7 +101,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	
 		protected BestMove<M> compute() {
 			// exceed time allowed per move
-			if(limitTime && timer.stop() >= timeAllowPerMove) {
+			if(limitTime && timer.timeup()) {
 				return new BestMove<M>(-this.e.infty());
 			}
 			
