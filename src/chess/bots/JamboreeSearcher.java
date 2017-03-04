@@ -111,7 +111,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				}
 				return new BestMove<M>(bestMove, alpha);
 			} else {
-				this.board = this.board.copy();
+				//this.board = this.board.copy();
 				if(this.move != null) {
 					this.board.applyMove(this.move);
 					this.move = null;
