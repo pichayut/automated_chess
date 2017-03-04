@@ -67,7 +67,7 @@ the experiment, do the following:
 
 |      Algorithm     | 1-ply | 2-ply | 3-ply | 4-ply | 5-ply |
 | :----------------: |:-----:|:-----:|:-----:|:-----:|:-----:|
-|       Minimax      |       |       |       |       |       |
+|       Minimax      |       |       |68424031|       |       |
 |  Parallel Minimax  |       |       |       |       |       |
 |      Alphabeta     |       |       |       |       |       |
 |      Jamboree      |       |       |       |       |       |
