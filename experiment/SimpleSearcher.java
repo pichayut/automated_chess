@@ -14,12 +14,19 @@ import cse332.chess.interfaces.Move;
 public class SimpleSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 
-    public M getBestMove(B board, int myTime, int opTime) {
+    private static int count = 0;
+
+	public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
         return minimax(this.evaluator, board, ply, null).move;
     }
+	
+	public int getCount() {
+		return count;
+	}
 
     static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth, List<M> moves) {
+		count ++;
     	if(depth == 0) {
     		return new BestMove<M>(evaluator.eval(board));
     	}

@@ -8,12 +8,19 @@ import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
 
 public class AlphaBetaSearcher<M extends Move<M>, B extends Board<M, B>> extends AbstractSearcher<M, B> {
-    public M getBestMove(B board, int myTime, int opTime) {
+	private static int count = 0;
+
+	public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
         return alphaBeta(this.evaluator, board, ply, null, -this.evaluator.infty(), this.evaluator.infty()).move;
     }
+    
+    public int getCount() {
+		return count;
+	}
 
     static <M extends Move<M>, B extends Board<M, B>> BestMove<M> alphaBeta(Evaluator<B> evaluator, B board, int depth, List<M> moves, int alpha, int beta) {
+    	count++;
     	if(depth == 0) {
     		return new BestMove<M>(evaluator.eval(board));
     	}
