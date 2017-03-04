@@ -20,6 +20,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
+    private static int timeAllowPerMove = 10000;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
@@ -77,7 +78,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		}
     	
 		protected BestMove<M> compute() {
-			if(timer.stop() >= 6000) return new BestMove(-this.e.infty());
+			if(timer.stop() >= timeAllowPerMove) return new BestMove(-this.e.infty());
 			M bestMove = null;
 			if(!AlreadyHaveGoodAlphaBeta) {
 				this.board = this.board.copy();
