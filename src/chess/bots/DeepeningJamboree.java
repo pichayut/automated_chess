@@ -21,13 +21,8 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static SimpleTimer timer;
-    
-    // Limit time per move
-    private static final int timeAllowPerMove = 7000;
+    private static final int timeAllowPerMove = 10000;
     private static final boolean limitTime = true;
-    
-    // how many depth allowed to check for consistent moves
-	private static final int CONS = 3;
     private static Random rt = new Random();
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
@@ -37,22 +32,12 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	timer = new SimpleTimer(0, 0);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     	timer.start(myTime, opTime);
-    	int consistent = 0;
-    	BestMove<M> prevMove = null;
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>(this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
     	while(depth <= ply) {
     		sortAll();
     		timer.start(myTime, opTime);
     		bestMove = new DeepeningSubTask<M, B>(this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
-    		if(bestMove.equals(prevMove)) {
-    			consistent++;
-    		} else {
-    			consistent = 0;
-    		}
-    		if(consistent == CONS && depth == ply - 1) {
-    			break;
-    		}
     		depth++;
     	}
     	return bestMove.move;
@@ -148,11 +133,11 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    	}
 				
 				if(this.depth <= this.cutoff || this.tupleMoves.size() == 0) {
-					/*List<M> tmpMoves = new ArrayList<M>();
+					List<M> tmpMoves = new ArrayList<M>();
 					for(int i = 0; i < this.tupleMoves.size(); i++) {
 						tmpMoves.add((M) this.tupleMoves.get(i).getMove());
-					}*/
-					return DeepeningSequential.alphaBeta(keepMove, this.e, this.board, this.depth, this.tupleMoves, this.alpha, this.beta);
+					}
+					return AlphaBetaSearcher.alphaBeta(this.e, this.board, this.depth, tmpMoves, this.alpha, this.beta);
 				}
 		    	for (int i = l; i < l + (int) (PERCENTAGE_SEQUENTIAL * this.size()); i++) {
 		    		M move = (M) this.tupleMoves.get(i).getMove();
