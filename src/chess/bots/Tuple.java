@@ -23,6 +23,10 @@ public class Tuple<M extends Move<M>> implements Comparable<Tuple<M>> {
 	public int getVal() {
 		return this.val;
 	}
+	
+	public void resetVal() {
+		this.val = 0;
+	}
 
 	@Override
 	public int compareTo(Tuple<M> obj) {
