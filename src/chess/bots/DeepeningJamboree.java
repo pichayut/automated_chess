@@ -20,8 +20,8 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
-    private static int timeAllowPerMove = 20000;
-    private static final boolean limitTime = false;
+    private static int timeAllowPerMove = 30000;
+    private static final boolean limitTime = true;
     private static Random rt = new Random();
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
@@ -29,13 +29,15 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
+    	//((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     	timer.start(myTime, opTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
-    	while(depth <= ply) {
+    	int newPly = ply;
+    	if(50 - board.plyCount() / 2 <= 20) newPly++;
+    	while(depth <= newPly) {
     		sortAll();
     		//BestMove<M> tmp;
     		bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
@@ -108,7 +110,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	
 		protected BestMove<M> compute() {
 			// exceed time allowed per move
-			if(limitTime && (timer.timeup() || timer.stop() > timeAllowPerMove)) {
+			if(limitTime && (/*timer.timeup() ||*/ timer.stop() > timeAllowPerMove)) {
 				if(!keepBestMove.containsKey(this.board.fen())) {
 					return new BestMove<M>(-this.e.infty());
 				} else {
