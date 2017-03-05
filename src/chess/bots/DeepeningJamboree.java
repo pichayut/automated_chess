@@ -108,7 +108,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	
 		protected BestMove<M> compute() {
 			// exceed time allowed per move
-			if(limitTime && timer.timeup()) {
+			if(limitTime && (timer.timeup() || timer.stop() > timeAllowPerMove)) {
 				if(!keepBestMove.containsKey(this.board.fen())) {
 					return new BestMove<M>(-this.e.infty());
 				} else {
