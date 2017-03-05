@@ -25,6 +25,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final boolean limitTime = false;
     private static Random rt = new Random();
     private static ArrayMove prevMove = null;
+    private static ArrayMove tmpPrevMove = null;
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     //private static Map<State, Pair> keepBestMove = new ConcurrentHashMap<State, Pair>();
@@ -53,7 +54,8 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     		}*/
     		depth++;
     	}
-    	prevMove = (ArrayMove) bestMove.move;
+    	prevMove = tmpPrevMove;
+    	tmpPrevMove = (ArrayMove) bestMove.move;
     	return bestMove.move;
     }
     
