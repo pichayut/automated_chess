@@ -16,7 +16,7 @@ import chess.game.SimpleTimer;
 public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
-	private static ForkJoinPool POOL = new ForkJoinPool();
+	//private static ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
@@ -24,15 +24,12 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final boolean limitTime = false;
     private static Random rt = new Random();
     
-    private static Map<String, List<Tuple<ArrayMove>>> keepMove;
-    private static Map<String, Pair> keepBestMove;
+    private static Map<String, List<Tuple<ArrayMove>>> keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
+    private static Map<String, Pair> keepBestMove = new ConcurrentHashMap<String, Pair>();;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
     	//((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
-    	
-    	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
-    	keepBestMove = new ConcurrentHashMap<String, Pair>();
     	
     	timer.start(myTime, opTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();

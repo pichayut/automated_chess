@@ -24,7 +24,7 @@ public class Engine {
 	    searcher = new DeepeningJamboree<ArrayMove,ArrayBoard>();
 	
 	public Engine(int time, int inc) {
-        searcher.setDepth(7);
+        searcher.setDepth(8);
         searcher.setCutoff(2);
 
         searcher.setEvaluator(new SimpleEvaluator());
