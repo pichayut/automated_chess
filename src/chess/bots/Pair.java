@@ -1,16 +1,18 @@
 package chess.bots;
 
+import chess.board.ArrayMove;
+
 public class Pair {
-	private String str;
+	private BestMove<ArrayMove> bestMove;
 	private int depth;
 
-	public Pair(String str, int depth) {
-		this.str = str;
+	public Pair(BestMove<ArrayMove> bestMove, int depth) {
+		this.bestMove = bestMove;
 		this.depth = depth;
 	}
 	
-	public String getBoardFen() {
-		return str;
+	public BestMove<ArrayMove> getBestMove() {
+		return bestMove;
 	}
 	
 	public int getDepth() {
@@ -21,6 +23,6 @@ public class Pair {
 	public boolean equals(Object obj) {
 		if(!(obj instanceof Pair)) return false;
 		Pair o = (Pair) obj;
-		return this.str.equals(o.str) && this.depth == o.depth;
+		return this.bestMove.move.equals(o.bestMove.move) && this.bestMove.value == o.bestMove.value && this.depth == o.depth;
 	}
 }
