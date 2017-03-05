@@ -37,7 +37,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
     	int newPly = ply;
-    	//if(50 - board.plyCount() / 2 <= 20) newPly++;
+    	if(50 - board.plyCount() / 2 <= 20) newPly++;
     	while(depth <= newPly) {
     		sortAll();
     		//BestMove<M> tmp;
