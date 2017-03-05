@@ -26,14 +26,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
     private static Map<String, BestMove<ArrayMove>> keepBestMove;
-    private static Map<Pair, BestMove<ArrayMove>> keepState;
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
     	//((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
-    	keepState = new ConcurrentHashMap<Pair, BestMove<ArrayMove>>();
+    	//keepState = new ConcurrentHashMap<Pair, BestMove<ArrayMove>>();
     	timer.start(myTime, opTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
@@ -113,9 +112,9 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		protected BestMove<M> compute() {
 			
 			// TranspositionTable
-			if(keepState.containsKey(new Pair(this.board.fen(), depth))) {
+			/*if(keepState.containsKey(new Pair(this.board.fen(), depth))) {
 				return (BestMove<M>) keepState.get(new Pair(this.board.fen(), depth));
-			}
+			}*/
 			
 			// exceed time allowed per move
 			if(limitTime && (/*timer.timeup() ||*/ timer.stop() > timeAllowPerMove)) {
@@ -181,7 +180,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
 		    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
 		    			
-		    			keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
+		    			//keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
 		    			return best;
 		    		}
 		    	}
@@ -221,7 +220,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	    				//Collections.sort(this.tupleMoves);
 	    			}
 	    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
-	    			keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
+	    			//keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
 				}
     			return best;
 			} else {
@@ -278,7 +277,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
 	    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
 	    			
-	    			keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
+	    			//keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
 	    			return best;
 		    	}
 		    	//---------------------
@@ -301,7 +300,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
 		    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
 		    			
-		    			keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
+		    			//keepState.put(new Pair(this.board.fen(), depth), (BestMove<ArrayMove>) best);
 		    			return best;
 			    	}
 		    	}
