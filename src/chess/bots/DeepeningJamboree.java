@@ -24,12 +24,12 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static int timeAllowPerMove = 30000;
     private static final boolean limitTime = false;
     private static Random rt = new Random();
+    private static ArrayMove prevMove = null;
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     //private static Map<State, Pair> keepBestMove = new ConcurrentHashMap<State, Pair>();
     
     public M getBestMove(B board, int myTime, int opTime) {
-    	
     	/*for(List<Tuple<ArrayMove>> lst : keepMove.values()) {
     		for(Tuple<ArrayMove> t : lst) {
     			t.resetVal();
@@ -43,7 +43,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
     	int newPly = ply;
-    	//if(50 - board.plyCount() / 2 <= 10) newPly++;
+    	if(50 - board.plyCount() / 2 <= 15) newPly++;
     	while(depth <= newPly) {
     		sortAll();
     		//BestMove<M> tmp;
@@ -53,6 +53,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     		}*/
     		depth++;
     	}
+    	prevMove = (ArrayMove) bestMove.move;
     	return bestMove.move;
     }
     
@@ -170,7 +171,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    		int value = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.e, this.board, null, this.depth - 1
 		    				, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false, false, ThreadLocalRandom.current().nextInt(2) == 1).compute().negate().value;
 		    		this.board.undoMove();
-		    		if (!checkEquals ? value > alpha : value >= alpha) {
+		    		if (!checkEquals ? value > alpha : value >= alpha && prevMove != null && !move.serverString().equals(prevMove.serverString())) {
 		    			alpha = value;
 		    			bestMove = move;
 		    			indexBest = i;
@@ -208,13 +209,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 				
 				leftTask.fork();
 				BestMove<M> answer = rightTask.compute();
-				if(!checkEquals ? answer.value > alpha : answer.value >= alpha) {
+				if(!checkEquals ? answer.value > alpha : answer.value >= alpha && prevMove != null && answer.move != null && !answer.move.serverString().equals(prevMove.serverString())) {
 					alpha = answer.value;
 					bestMove = answer.move;
 					indexBest = answer.indexBest;
 				}
 				BestMove<M> leftAnswer = leftTask.join();
-				if(!checkEquals ? leftAnswer.value > alpha : leftAnswer.value >= alpha) {
+				if(!checkEquals ? leftAnswer.value > alpha : leftAnswer.value >= alpha && prevMove != null && leftAnswer.move != null && !leftAnswer.move.serverString().equals(prevMove.serverString())) {
 					alpha = leftAnswer.value;
 					bestMove = leftAnswer.move;
 					indexBest = leftAnswer.indexBest;
@@ -269,7 +270,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    	DeepeningSubTask<M, B> current = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.e, this.board, (M) tupleMoves.get(ed - 1).getMove(), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false, false, ThreadLocalRandom.current().nextInt(2) == 1);
 		    	int value = current.compute().negate().value;
 		    	int r = ThreadLocalRandom.current().nextInt(2);
-		    	if (!checkEquals ? value > alpha : value >= alpha) {
+		    	if (!checkEquals ? value > alpha : value >= alpha && prevMove != null  && !((M) this.tupleMoves.get(ed - 1).getMove()).serverString().equals(prevMove.serverString())) {
 		    		alpha = value;
 		    		bestMove = (M) this.tupleMoves.get(ed - 1).getMove();
 		    		indexBest = ed - 1;
@@ -293,7 +294,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    	
 		    	for(int i = 0; i < taskList.size(); i++) {
 		    		value = taskList.get(i).join().negate().value;
-		    		if (!checkEquals ? value > alpha : value >= alpha) {
+		    		if (!checkEquals ? value > alpha : value >= alpha && prevMove != null && !((M) this.tupleMoves.get(i + st).getMove()).serverString().equals(prevMove.serverString())) {
 			    		alpha = value;
 			    		bestMove = (M) this.tupleMoves.get(i + st).getMove();
 			    		indexBest = i + st;
