@@ -89,7 +89,8 @@ this sort of makes since since after a certain time, the parallel algorithms cal
 
 We believe that there is a substantial difference between the four algorithms since AlphaBeta and Jamboree looked at much less moves than
 Minimax and Parallel Minimax which then allows it to run much faster. However, AlphaBeta and Jamboree were very similar to each other and
-Minimax and Parallel Minimax were very similar to each other.</pre>
+Minimax and Parallel Minimax were very similar to each other which makes since since these algorithms have the same setup, but all the 
+parallel algorithms do is run the multiple moves at the same time.</pre>
 
 ### Optimizing Experiments ###
 THE EXPERIMENTS IN THIS SECTION WILL TAKE A LONG TIME TO RUN. 
