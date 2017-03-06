@@ -102,7 +102,7 @@ Because chess games are very different at the beginning, middle,
 and end, you should choose the starting board, a board around the middle
 of a game, and a board about 5 moves from the end of the game.  The exact boards
 you choose don't matter (although, you shouldn't choose a board already in
-checkmate), but they should be different. 
+checkmate), but they should be different.
 
 #### Sequential Cut-Offs ####
 Experimentally determine the best sequential cut-off for both of your
