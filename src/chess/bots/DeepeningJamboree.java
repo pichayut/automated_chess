@@ -21,12 +21,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
-    private static int timeAllowPerMove = 15000;
+    private static int timeAllowPerMove = 20000;
     private static final boolean limitTime = true;
     private static Random rt = new Random();
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
     private static Map<String, BestMove<ArrayMove>> keepBestMove;
+    
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
@@ -51,6 +52,12 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     private int add(B board) {
     	int cnt = ((ArrayBoard)board).countOfAllPieces();
+    	int cntOp = ((ArrayBoard)board).countOfColor(((ArrayBoard)board).toPlay());
+    	
+    	// Only king
+    	if(cntOp == 1) {
+    		return ply + 3; 
+    	}
     	
     	if(cnt > 18) {
     		return ply;
