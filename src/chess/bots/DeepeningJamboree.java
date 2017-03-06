@@ -54,10 +54,12 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	
     	if(cnt > 18) {
     		return ply;
-    	} else if(cnt > 9) {
-    		return ply + 1;
-    	} else {
+    	} else if(cnt > 14) {
     		return ply + 2;
+    	} else if(cnt > 9){
+    		return ply + 3;
+    	} else {
+    		return ply + 4;
     	}
 	}
 
