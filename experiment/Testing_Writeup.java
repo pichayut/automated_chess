@@ -18,19 +18,20 @@ public class Testing_Writeup {
     public static void main(String[] args) throws FileNotFoundException {
     	Testing_Writeup game = new Testing_Writeup();
     	
-    	if (false) {
+    	/*
+    	if (true) {
 	    	PrintStream out = new PrintStream(new File("./experiment/boards.txt"));
 	        game.play(out, STARTING_POSITION);
 	        out.close();
     	}
+    	*/
          
         Scanner in = new Scanner(new File("./experiment/boards.txt"));
-        int count = 0;
+        PrintStream output = new PrintStream(new File("./experiment/cutoff.txt"));
         while(in.hasNextLine()) {
         	game.play(System.out, in.nextLine());
-        	count += ((JamboreeSearcher) whitePlayer).getCount();
+        	output.println(((JamboreeSearcher) whitePlayer).getCount());
         }
-        System.out.println(count);
         in.close();
     }
 
