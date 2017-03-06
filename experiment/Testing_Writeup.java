@@ -17,13 +17,13 @@ public class Testing_Writeup {
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/JamboreeCutoff.txt"));
+    	PrintStream output = new PrintStream(new File("./experiment/ParallelMinimaxCutoff.txt"));
     	for(int i = 0; i <= 5; i++) {
     		Testing_Writeup game = new Testing_Writeup(i);
     		in = new Scanner(new File("./experiment/boards.txt"));
             while(in.hasNextLine()) {
             	game.play(System.out, in.nextLine());
-            	output.println(((JamboreeSearcher) whitePlayer).getCount() + " cutoff = " + i);
+            	output.println(((ParallelSearcher) whitePlayer).getCount() + " cutoff = " + i);
             }
     	}
     	
@@ -39,8 +39,8 @@ public class Testing_Writeup {
     }
 
     public Testing_Writeup(int cutoff) {
-        setupWhitePlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 5, cutoff);
-        setupBlackPlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 4, 4);
+        setupWhitePlayer(new ParallelSearcher<ArrayMove, ArrayBoard>(), 5, cutoff);
+        setupBlackPlayer(new ParallelSearcher<ArrayMove, ArrayBoard>(), 4, 4);
     }
     
     public void play(PrintStream out, String currentBoard) {
