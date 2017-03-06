@@ -34,7 +34,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     	//timer.start(myTime, opTime);
-    	int newPly = ply;
+    	int newPly = add(board);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
     	while(depth <= newPly) {
