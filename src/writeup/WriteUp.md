@@ -62,21 +62,34 @@ the experiment, do the following:
    implementations).  Make a pretty graph of your results (link to it from
    here) and fill in the table here as well:
 
-<pre>TODO: Fill in the table below</pre>
+<pre>For this table, we used a cut-off of 3 for the two non-parallel algorithms and the recommended ply/2 for the parallel
+algorithms. For the board, we only used the starting board for a single game which is why our hypothesis was so far off since
+the number of moves that are accessible in the beginning game is much less than the total of moves available. If we used our 
+method from before than we would have gotten 20 moves total so 3-ply deep would have gotten 8,000 moves to check which is
+very close to the Minimax algorithm's actual number of steps. For our method, we said that AlphaBeta would have gotten about half
+of the moves that Minimax got, so we would have guessed that there would have been 4,000 which is very far off of the actual 
+value. This must mean that AlphaBeta prunes off much more than what we predicted.</pre>
 
 
 |      Algorithm     | 1-ply | 2-ply | 3-ply | 4-ply | 5-ply |
 | :----------------: |:-----:|:-----:|:-----:|:-----:|:-----:|
-|       Minimax      |       |       |68424031|       |       |
-|  Parallel Minimax  |       |       |       |       |       |
-|      Alphabeta     |       |       |       |       |       |
-|      Jamboree      |       |       |       |       |       |
+|       Minimax      |	21   |  421  |  9323 |206604 |5072213|
+|  Parallel Minimax  |  55   |  410  |  9200 |192317 |4252484|
+|      Alphabeta     |  42   |  60   |  594  | 2533  | 95475 |
+|      Jamboree      |  50   |  90   |  588  | 2370  |100668 |
 
 #### Conclusions ####
 How close were your estimates to the actual values?  Did you find any
 entry in the table surprising?  Based ONLY on this table, do you feel
 like there is a substantial difference between the four algorithms?
-<pre>TODO</pre>
+<pre>Our values for Minimax were very close to our predicted value if we used the same method that we used for the hypothesis, but
+only use the available moves for the starting board which is 20 moves so 3-ply deep gets 8,000 moves which is very close to the 9323
+moves from our values. We very interested to see that the parallel algorithms weren't too far off from the non-parallel algorithms, but
+this sort of makes since since after a certain time, the parallel algorithms call the non-parallel algorithms.
+
+We believe that there is a substantial difference between the four algorithms since AlphaBeta and Jamboree looked at much less moves than
+Minimax and Parallel Minimax which then allows it to run much faster. However, AlphaBeta and Jamboree were very similar to each other and
+Minimax and Parallel Minimax were very similar to each other.</pre>
 
 ### Optimizing Experiments ###
 THE EXPERIMENTS IN THIS SECTION WILL TAKE A LONG TIME TO RUN. 
@@ -89,7 +102,7 @@ Because chess games are very different at the beginning, middle,
 and end, you should choose the starting board, a board around the middle
 of a game, and a board about 5 moves from the end of the game.  The exact boards
 you choose don't matter (although, you shouldn't choose a board already in
-checkmate), but they should be different.
+checkmate), but they should be different. 
 
 #### Sequential Cut-Offs ####
 Experimentally determine the best sequential cut-off for both of your
@@ -128,7 +141,7 @@ Plot your results and discuss anything surprising about your results here.
 
 |      Algorithm     | Early Game | Mid Game | End Game |
 | :----------------: |:----------:|:--------:|:--------:|
-|       Minimax      |            |   heh       |          |
+|       Minimax      |            |          |          |
 |  Parallel Minimax  |            |          |          |
 |      Alphabeta     |            |          |          |
 |      Jamboree      |            |          |          |

@@ -42,6 +42,38 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			return r - l;
 		}
 		
+		static <M extends Move<M>, B extends Board<M, B>> BestMove<M> minimax(Evaluator<B> evaluator, B board, int depth, List<M> moves) {
+			count++;
+	    	if(depth == 0) {
+	    		return new BestMove<M>(evaluator.eval(board));
+	    	}
+	    	
+	    	if(moves == null) {
+	    		moves = board.generateMoves();
+	    	}
+	    	
+	    	if(moves.isEmpty()) {
+	    		if(board.inCheck()) {
+	    			return new BestMove<M>(-evaluator.mate() - depth);
+	    		} else {
+	    			return new BestMove<M>(-evaluator.stalemate());
+	    		}
+	    	}
+	    	
+	    	int bestValue = Integer.MIN_VALUE;
+	    	M bestMove = null;
+	    	for(M move : moves) {
+	    		board.applyMove(move);
+	    		int value = -minimax(evaluator, board, depth - 1, null).value;
+	    		board.undoMove();
+	    		if(value > bestValue) {
+	    			bestValue = value;
+	    			bestMove = move;
+	    		}
+	    	}
+	    	return new BestMove<M>(bestMove, bestValue);
+	    }
+		
 		protected BestMove<M> compute() {
 			if(this.size() <= this.divideCutoff) {
 				if(moves == null) {
@@ -50,7 +82,7 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 				} 
 				this.board = this.board.copy();
 				if(depth <= cutoff || this.size() == 0) {
-		    		return SimpleSearcher.minimax(e, board, depth, moves);
+		    		return minimax(e, board, depth, moves);
 				}
 				List<GetBestMoveTask<M, B>> taskList = new ArrayList<GetBestMoveTask<M, B>>();
 				for(int i = l; i < r - 1; i++) {

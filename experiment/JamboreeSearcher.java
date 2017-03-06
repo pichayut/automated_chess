@@ -59,6 +59,40 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 			return this.r - this.l;
 		}
     	
+    	static <M extends Move<M>, B extends Board<M, B>> BestMove<M> alphaBeta(Evaluator<B> evaluator, B board, int depth, List<M> moves, int alpha, int beta) {
+        	count++;
+        	if(depth == 0) {
+        		return new BestMove<M>(evaluator.eval(board));
+        	}
+        	
+        	if(moves == null) {
+        		moves = board.generateMoves();
+        	}
+        	
+        	if(moves.isEmpty()) {
+        		if(board.inCheck()) {
+        			return new BestMove<M>(-evaluator.mate() - depth);
+        		} else {
+        			return new BestMove<M>(-evaluator.stalemate());
+        		}
+        	}
+        	
+        	M bestMove = null;
+        	for(M move : moves) {
+        		board.applyMove(move);
+        		int value = -alphaBeta(evaluator, board, depth - 1, null, -beta, -alpha).value;
+        		board.undoMove();
+        		if (value > alpha) {
+        			alpha = value;
+        			bestMove = move;
+        		}
+        		if (alpha >= beta) {
+        			return new BestMove<M>(bestMove, alpha);
+        		}
+        	}
+        	return new BestMove<M>(bestMove, alpha);
+        }
+    	
 		protected BestMove<M> compute() {
 			M bestMove = null;
 			if(!AlreadyHaveGoodAlphaBeta) {
@@ -74,7 +108,7 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		    	}
 				
 				if(this.depth <= this.cutoff || this.moves.size() == 0) {
-					return AlphaBetaSearcher.alphaBeta(this.e, this.board, this.depth, this.moves, this.alpha, this.beta);
+					return alphaBeta(this.e, this.board, this.depth, this.moves, this.alpha, this.beta);
 				}
 		    	for (int i = l; i < l + (int) (PERCENTAGE_SEQUENTIAL * this.size()); i++) {
 		    		M move = this.moves.get(i);
