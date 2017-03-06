@@ -52,16 +52,16 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     private int add(B board, int myTime) {
     	int cnt = ((ArrayBoard)board).countOfAllPieces();
-    	//int cntOp = ((ArrayBoard)board).countOfColor((((ArrayBoard)board).toPlay() + 1) % 2);
+    	int cntOp = ((ArrayBoard)board).countOfColor((((ArrayBoard)board).toPlay() + 1) % 2);
     	
     	if(myTime <= 30000) {
     		return ply;
     	}
     	
     	// Only king
-    	/*if(cntOp == 1) {
-    		return ply + 3; 
-    	}*/
+    	if(cntOp == 1) {
+    		return ply + 1; 
+    	}
     	
     	if(cnt > 22) {
     		return ply;
