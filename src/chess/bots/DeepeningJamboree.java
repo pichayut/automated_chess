@@ -10,6 +10,7 @@ import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
 import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
+import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
 import chess.game.SimpleTimer;
 
@@ -32,11 +33,11 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	//((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
-    	timer.start(myTime, opTime);
+    	//timer.start(myTime, opTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
-    	int newPly = ply;
-    	if(50 - board.plyCount() / 2 <= 15) newPly++;
+    	int newPly = add(board);
+    	
     	while(depth <= newPly) {
     		sortAll();
     		//BestMove<M> tmp;
@@ -49,7 +50,19 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	return bestMove.move;
     }
     
-    private void sortAll() {
+    private int add(B board) {
+    	int cnt = ((ArrayBoard)board).countOfAllPieces();
+    	
+    	if(cnt > 18) {
+    		return ply;
+    	} else if(cnt > 9) {
+    		return ply + 1;
+    	} else {
+    		return ply + 2;
+    	}
+	}
+
+	private void sortAll() {
 		for(List<Tuple<ArrayMove>> lst : keepMove.values()) {
 			Collections.sort(lst);
 		}
