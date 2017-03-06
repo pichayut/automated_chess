@@ -35,7 +35,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
     	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     	timer.start(myTime, opTime);
-    	int newPly = add(board);
+    	int newPly = add(board, myTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
     	while(depth <= newPly) {
@@ -50,9 +50,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	return bestMove.move;
     }
     
-    private int add(B board) {
+    private int add(B board, int myTime) {
     	int cnt = ((ArrayBoard)board).countOfAllPieces();
     	//int cntOp = ((ArrayBoard)board).countOfColor((((ArrayBoard)board).toPlay() + 1) % 2);
+    	
+    	if(myTime <= 30000) {
+    		return ply;
+    	}
     	
     	// Only king
     	/*if(cntOp == 1) {
