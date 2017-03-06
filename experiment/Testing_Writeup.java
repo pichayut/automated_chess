@@ -24,7 +24,7 @@ public class Testing_Writeup {
             while(in.hasNextLine()) {
             	game.play(System.out, in.nextLine());
             	output.println(((ParallelSearcher) whitePlayer).getCount() + " cutoff = " + i);
-            } 
+            }
     	}
     	
     	/*
