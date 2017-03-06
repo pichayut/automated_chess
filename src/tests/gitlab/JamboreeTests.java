@@ -26,15 +26,15 @@ public class JamboreeTests extends SearcherTests {
 	    
         test("depth2", TestingInputs.FENS_TO_TEST.length);
         test("depth3", TestingInputs.FENS_TO_TEST.length);
-        test("depth4", TestingInputs.FENS_TO_TEST.length);
+        //test("depth4", TestingInputs.FENS_TO_TEST.length);
 
         ALLOWED_TIME = 60000;
         long startTime = System.currentTimeMillis();
-        test("depth5", TestingInputs.FENS_TO_TEST.length);
+        test("depth4", TestingInputs.FENS_TO_TEST.length);
         long endTime = System.currentTimeMillis();
         System.out.println(endTime - startTime);
         startTime = System.currentTimeMillis();
-        test("depth6", TestingInputs.FENS_TO_TEST.length);
+        test("depth5", TestingInputs.FENS_TO_TEST.length);
         endTime = System.currentTimeMillis();
         System.out.println(endTime - startTime);
         

@@ -17,7 +17,7 @@ import chess.game.SimpleTimer;
 public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
-	//private static ForkJoinPool POOL = new ForkJoinPool();
+	private static ForkJoinPool POOL = new ForkJoinPool();
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
@@ -48,7 +48,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	while(depth <= newPly) {
     		sortAll();
     		//BestMove<M> tmp;
-    		bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
+    		bestMove = POOL.invoke(new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false));
     		/*if(tmp.value > bestMove.value) {
     			bestMove = tmp;
     		}*/
