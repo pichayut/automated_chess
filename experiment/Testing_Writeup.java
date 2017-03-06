@@ -16,7 +16,16 @@ public class Testing_Writeup {
     private ArrayBoard board;
     
     public static void main(String[] args) throws FileNotFoundException {
-    	Testing_Writeup game = new Testing_Writeup();
+    	Scanner in = null;
+    	PrintStream output = new PrintStream(new File("./experiment/cutoff.txt"));
+    	for(int i = 0; i <= 5; i++) {
+    		Testing_Writeup game = new Testing_Writeup(i);
+    		in = new Scanner(new File("./experiment/boards.txt"));
+            while(in.hasNextLine()) {
+            	game.play(System.out, in.nextLine());
+            	output.println(((JamboreeSearcher) whitePlayer).getCount() + " cutoff = " + i);
+            }
+    	}
     	
     	/*
     	if (true) {
@@ -25,18 +34,12 @@ public class Testing_Writeup {
 	        out.close();
     	}
     	*/
-         
-        Scanner in = new Scanner(new File("./experiment/boards.txt"));
-        PrintStream output = new PrintStream(new File("./experiment/cutoff.txt"));
-        while(in.hasNextLine()) {
-        	game.play(System.out, in.nextLine());
-        	output.println(((JamboreeSearcher) whitePlayer).getCount());
-        }
+        
         in.close();
     }
 
-    public Testing_Writeup() {
-        setupWhitePlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 5, 4);
+    public Testing_Writeup(int cutoff) {
+        setupWhitePlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 5, cutoff);
         setupBlackPlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 4, 4);
     }
     

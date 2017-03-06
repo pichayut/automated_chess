@@ -10,7 +10,9 @@ import java.awt.Graphics;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -24,36 +26,41 @@ import cse332.chess.server.Hub;
 
 public final class MessagePanel extends JPanel {
     private static final long serialVersionUID = -4281264808206657839L;
-	private Hub hub;
-	private JScrollPane taMessageScroll;
-	private JTextArea taMessage;
-	private JTextField tfCommand;
-	private CheckboxGroup cbgTalk;
-	private Checkbox cbTalkAll, cbTalkOpp, cbCommand;
-	private Label labelSay;
+    private Hub hub;
+    private JScrollPane taMessageScroll;
+    private JTextArea taMessage;
+    private JTextField tfCommand;
+    private CheckboxGroup cbgTalk;
+    private Checkbox cbTalkAll, cbTalkOpp, cbCommand, cbJoin;
+    private Label labelSay;
+    private AtomicBoolean autoJoin = new AtomicBoolean(false);
+    private Thread autoJoinWatcher;
+    //    private GamePanel gamePanel;
+    private Board gameBoard;
+    private Field boardPlayingField;
 
-	// size at which a text area is considered overflowed
-	private static final int nTextBufferLength = 5000;
+    // size at which a text area is considered overflowed
+    private static final int nTextBufferLength = 5000;
 
-	// amount of a text area to delete when overflowed
-	private static final int nTextBufferDecrement = 1000;
+    // amount of a text area to delete when overflowed
+    private static final int nTextBufferDecrement = 1000;
 
-	private boolean commandEnabled = true;
+    private boolean commandEnabled = true;
 
-	public MessagePanel(Hub hub2) {
-		hub = hub2;
-		
-		if (hub2.applet == null) {
-		    return;
-		}
+    public MessagePanel(Hub hub2) {
+        hub = hub2;
 
-		this.setBackground(Config.colorMessage);
+        if (hub2.applet == null) {
+            return;
+        }
 
-		// create components
-		taMessage = new JTextArea(8, 20);
-		taMessage.setEditable(false);
-		// This auto-scrolls the document
-		taMessage.getDocument ().addDocumentListener (new DocumentListener () {
+        this.setBackground(Config.colorMessage);
+
+        // create components
+        taMessage = new JTextArea(8, 20);
+        taMessage.setEditable(false);
+        // This auto-scrolls the document
+        taMessage.getDocument().addDocumentListener(new DocumentListener() {
             private void doUpdate() {
                 taMessage.setCaretPosition(taMessage.getDocument().getLength());
             }
@@ -69,184 +76,250 @@ public final class MessagePanel extends JPanel {
             public void removeUpdate(DocumentEvent e) {
                 doUpdate();
             }
-		});
+        });
 
-		tfCommand = new JTextField();
+        tfCommand = new JTextField();
 
-		cbgTalk = new CheckboxGroup();
-		cbTalkAll = new Checkbox("Chat", cbgTalk, false);
-		cbTalkOpp = new Checkbox("Talk to opponent", cbgTalk, false);
-		if (commandEnabled) {
-			cbCommand = new Checkbox("Command", cbgTalk, true);
-		}
+        cbgTalk = new CheckboxGroup();
+        cbTalkAll = new Checkbox("Chat", cbgTalk, false);
+        cbTalkOpp = new Checkbox("Talk to opponent", cbgTalk, false);
+        cbJoin = new Checkbox("Auto-Join", false);
+        cbJoin.addItemListener((e) -> {
+            if (cbJoin.getState()) {
+                if (this.gameBoard == null) {
+                    try {
+                        Field gamePanelField = Hub.class.getDeclaredField("gamePanel");
+                        gamePanelField.setAccessible(true);
+                        Field gameBoardField = GamePanel.class.getDeclaredField("board");
+                        gameBoardField.setAccessible(true);
+                        GamePanel gamePanel = (GamePanel) gamePanelField.get(this.hub);
+                        this.gameBoard = (Board) gameBoardField.get(gamePanel);
+                        this.boardPlayingField = Board.class.getDeclaredField("playing");
+                        this.boardPlayingField.setAccessible(true);
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                if (autoJoinWatcher == null) {
+                    autoJoinWatcher = new Thread(() -> {
+                        while (autoJoin.get()) {
+                            boolean playing = true;
+                            try {
+                                playing = this.boardPlayingField.getBoolean(this.gameBoard);
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                            if (!playing) {
+                                issueCommand("games");
+                            }
+                            try {
+                                Thread.sleep(5000L);
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    });
+                    autoJoinWatcher.start();
+                }
+                autoJoin.set(true);
+            } else {
+                autoJoin.set(false);
+                autoJoinWatcher = null;
+            }
+        });
 
-		Font textfont = new Font("Courier", Font.PLAIN, 12);
-		Font labelfont = new Font("Dialog", Font.BOLD, 12);
+        if (commandEnabled) {
+            cbCommand = new Checkbox("Command", cbgTalk, true);
+        }
 
-		taMessage.setFont(textfont);
-		tfCommand.setFont(textfont);
-		tfCommand.setBackground(Config.colorCommandArea);
-		tfCommand.setForeground(Config.colorCommandText);
-		
-		tfCommand.addActionListener (new ActionListener() {
+        Font textfont = new Font("Courier", Font.PLAIN, 12);
+        Font labelfont = new Font("Dialog", Font.BOLD, 12);
+
+        taMessage.setFont(textfont);
+        tfCommand.setFont(textfont);
+        tfCommand.setBackground(Config.colorCommandArea);
+        tfCommand.setForeground(Config.colorCommandText);
+
+        tfCommand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String s = tfCommand.getText();
                 if (s == null || s.length() == 0)
                     return;
                 issueCommand(s);
 
-			}
-		});
-		
+            }
+        });
 
-		this.setLayout(new BoxLayout (this, BoxLayout.Y_AXIS));
-		taMessageScroll = new JScrollPane (taMessage);
-		JPanel upperPane = new JPanel ();
-		upperPane.setMaximumSize (new Dimension(100000,tfCommand.getPreferredSize ().height));
-		upperPane.setLayout(new BoxLayout (upperPane, BoxLayout.X_AXIS));
-		labelSay = new Label("Do:");
-		labelSay.setFont(labelfont);
-		upperPane.add(labelSay);
-		upperPane.add(tfCommand);
-		tfCommand.setPreferredSize (new Dimension(100000,tfCommand.getPreferredSize ().height));
-		upperPane.add(cbTalkAll);
-		upperPane.add(cbTalkOpp);
-		if (commandEnabled) {
-			upperPane.add(cbCommand);
-		}
-		this.add (upperPane);
-		this.add(taMessageScroll);
-	}
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        taMessageScroll = new JScrollPane(taMessage);
+        JPanel upperPane = new JPanel();
+        upperPane.setMaximumSize(new Dimension(100000, tfCommand.getPreferredSize().height));
+        upperPane.setLayout(new BoxLayout(upperPane, BoxLayout.X_AXIS));
+        labelSay = new Label("Do:");
+        labelSay.setFont(labelfont);
+        upperPane.add(labelSay);
+        upperPane.add(tfCommand);
+        tfCommand.setPreferredSize(new Dimension(100000, tfCommand.getPreferredSize().height));
+        upperPane.add(cbTalkAll);
+        upperPane.add(cbTalkOpp);
+        if (commandEnabled) {
+            upperPane.add(cbCommand);
+        }
+        upperPane.add(cbJoin);
+        this.add(upperPane);
+        this.add(taMessageScroll);
+    }
 
-	private int sizeWidth = 0;
-	private int sizeColumns = 79;
+    private int sizeWidth = 0;
+    private int sizeColumns = 79;
 
-	private int getColumns() {
-		int w = taMessage.getSize().width;
+    private int getColumns() {
+        int w = taMessage.getSize().width;
 
-		if (w == sizeWidth) {
-			return sizeColumns;
-		}
+        if (w == sizeWidth) {
+            return sizeColumns;
+        }
 
-		FontMetrics fm = taMessage.getFontMetrics(taMessage.getFont());
-		if (fm == null) {
-			return sizeColumns;
-		}
+        FontMetrics fm = taMessage.getFontMetrics(taMessage.getFont());
+        if (fm == null) {
+            return sizeColumns;
+        }
 
-		sizeWidth = w;
-		int tempColumns = (w - 25) / fm.charWidth(' ');
-		if (tempColumns != sizeColumns) {
-			sizeColumns = tempColumns;
-		}
-		return sizeColumns;
-	}
+        sizeWidth = w;
+        int tempColumns = (w - 25) / fm.charWidth(' ');
+        if (tempColumns != sizeColumns) {
+            sizeColumns = tempColumns;
+        }
+        return sizeColumns;
+    }
 
-	private String chop(String s) {
-		int cols = getColumns();
+    private String chop(String s) {
+        int cols = getColumns();
 
-		StringTokenizer st = new StringTokenizer(s, "\n\r");
-		String retval = "";
-		while (st.hasMoreTokens()) {
-			retval = "\n" + retval + chopLine(st.nextToken(), cols);
-		}
+        StringTokenizer st = new StringTokenizer(s, "\n\r");
+        String retval = "";
+        while (st.hasMoreTokens()) {
+            retval = "\n" + retval + chopLine(st.nextToken(), cols);
+        }
 
-		return retval;
-	}
+        return retval;
+    }
 
-	private static String chopLine(String line, int cols) {
-		String retval = "";
-		int pos;
+    private static String chopLine(String line, int cols) {
+        String retval = "";
+        int pos;
 
-		while (line.length() > cols) {
-			pos = line.lastIndexOf(' ', cols);
-			if (pos < 3) {
-				// no white space to split on, split at right margin
-				retval += line.substring(0, cols) + '\n';
-				line = " " + line.substring(cols);
-			} 
-			else {
-				// split at the whitespace
-				retval += line.substring(0, pos) + '\n';
-				line = "  " + line.substring(pos);
-			}
-		}
-		retval += line;
-		return retval;
-	}
+        while (line.length() > cols) {
+            pos = line.lastIndexOf(' ', cols);
+            if (pos < 3) {
+                // no white space to split on, split at right margin
+                retval += line.substring(0, cols) + '\n';
+                line = " " + line.substring(cols);
+            } else {
+                // split at the whitespace
+                retval += line.substring(0, pos) + '\n';
+                line = "  " + line.substring(pos);
+            }
+        }
+        retval += line;
+        return retval;
+    }
 
-	public void addMessage(String s) {
-	    if (taMessage == null) {
-	        System.out.println(s);
-	        return;
-	    }
+    public void addMessage(String s) {
+        if (taMessage == null) {
+            System.out.println(s);
+            return;
+        }
 
-		if (taMessage.getText().length() > nTextBufferLength) {
-			taMessage.replaceRange("", 0, nTextBufferDecrement);
-		}
-		taMessage.append(chop(s));
-	}
+        if (taMessage.getText().length() > nTextBufferLength) {
+            taMessage.replaceRange("", 0, nTextBufferDecrement);
+        }
 
-	public void addChat(String s) {
-		addMessage(s);
-	}
+        String chop = chop(s);
+        System.out.println(chop);
+        if (cbJoin.getState()) {
+            parseAndJoin(chop);
+            boolean display = true;
+            display &= !chop.matches("(?s).*White:.*Black:.*Channel.*");
+            display &= display ? !chop.contains("Current Games:") : false;
+            display &= display ? !chop.matches("(?s)(>|\\s)*games\\s*") : false;
+            if (display) {
+                taMessage.append(chop);
+            }
+        } else {
+            taMessage.append(chop);
+        }
+    }
 
-	public void receive(String cmd, Object value) {
-	    addMessage(value + "\n");
-	}
+    public void addChat(String s) {
+        addMessage(s);
+    }
 
-	@SuppressWarnings ("deprecation")
-	public boolean action(Event evt, Object what) {
-		if (evt.target == cbCommand && ((Boolean) what).booleanValue()) {
-			labelSay.setText("Do:  ");
-		} 
-		else if (evt.target == cbTalkAll && ((Boolean) what).booleanValue()) {
-			labelSay.setText("Chat:");
-		} 
-		else if (evt.target == cbTalkOpp && ((Boolean) what).booleanValue()) {
-			labelSay.setText("Say: ");
-		}
+    public void receive(String cmd, Object value) {
+        addMessage(value + "\n");
+    }
 
-		return super.action(evt, what);
-	}
+    @SuppressWarnings("deprecation")
+    public boolean action(Event evt, Object what) {
+        if (evt.target == cbCommand && ((Boolean) what).booleanValue()) {
+            labelSay.setText("Do:  ");
+        } else if (evt.target == cbTalkAll && ((Boolean) what).booleanValue()) {
+            labelSay.setText("Chat:");
+        } else if (evt.target == cbTalkOpp && ((Boolean) what).booleanValue()) {
+            labelSay.setText("Say: ");
+        } else if (evt.target == cbJoin && ((Boolean) what).booleanValue()) {
+            issueCommand("games");
+        }
 
-	private void issueCommand(String s) {
-		if (cbTalkAll.getState()) {
-			hub.sendCommandAndEcho("MAIN", s);
-		}
-		else if (cbTalkOpp.getState()) {
-			hub.sendCommandAndEcho("GAME", s);
-		} 
-		else {
-		    if (s.indexOf(" ") != -1) {
-		        String[] result = s.split(" ", 2);
-		        hub.sendCommandAndEcho("", result[0] + " " + result[1]);
-		    }
-		    else {
-		        hub.sendCommandAndEcho("", s);
-		    }
-		}
-		tfCommand.setText("");
-	}
+        return super.action(evt, what);
+    }
 
-	public void giveFocus() {
-		tfCommand.requestFocus();
-	}
+    private void issueCommand(String s) {
+        if (cbTalkAll.getState()) {
+            hub.sendCommandAndEcho("MAIN", s);
+        } else if (cbTalkOpp.getState()) {
+            hub.sendCommandAndEcho("GAME", s);
+        } else {
+            if (s.indexOf(" ") != -1) {
+                String[] result = s.split(" ", 2);
+                hub.sendCommandAndEcho("", result[0] + " " + result[1]);
+            } else {
+                hub.sendCommandAndEcho("", s);
+            }
+        }
+        tfCommand.setText("");
+    }
 
-	public Dimension preferredSize() {
-		return minimumSize();
-	}
+    public void giveFocus() {
+        tfCommand.requestFocus();
+    }
 
-	public Dimension minimumSize() {
-		return new Dimension(40, taMessage.getPreferredSize().height
-				+ tfCommand.getPreferredSize().height);
-	}
+    public Dimension preferredSize() {
+        return minimumSize();
+    }
 
-	public void shutdown() {
-		taMessage.setText("");
-	}
+    public Dimension minimumSize() {
+        return new Dimension(40, taMessage.getPreferredSize().height + tfCommand.getPreferredSize().height);
+    }
 
-	public void paint(Graphics g) {
-		getColumns(); // check for a resize that might require changing the width variable
-		super.paint(g);
-	}
+    public void shutdown() {
+        taMessage.setText("");
+    }
+
+    public void paint(Graphics g) {
+        getColumns(); // check for a resize that might require changing the width variable
+        super.paint(g);
+    }
+
+    private void parseAndJoin(String chop) {
+        int index = chop.indexOf(hub.myName.replaceAll("[\\d]+", ""));
+        if (index != -1) {
+            chop = chop.substring(index);
+
+            int hashtagYOLO = chop.indexOf('#');
+            if (hashtagYOLO != -1) {
+                hub.sendCommandAndEcho("", "watch " + chop.substring(hashtagYOLO, hashtagYOLO + 16));
+            }
+        }
+    }
 }
