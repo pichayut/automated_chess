@@ -10,7 +10,6 @@ import cse332.chess.interfaces.AbstractSearcher;
 import cse332.chess.interfaces.Board;
 import cse332.chess.interfaces.Evaluator;
 import cse332.chess.interfaces.Move;
-import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
 import chess.game.SimpleTimer;
 
@@ -22,40 +21,31 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final int DIVIDE_CUTOFF = 2;
     private static final double FACTION = 1; //0.65;
     private static int timeAllowPerMove = 30000;
-    private static final boolean limitTime = false;
+    private static final boolean limitTime = true;
     private static Random rt = new Random();
-    private static ArrayMove prevMove = null;
-    private static ArrayMove tmpPrevMove = null;
     
-    private static Map<String, List<Tuple<ArrayMove>>> keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
-    //private static Map<State, Pair> keepBestMove = new ConcurrentHashMap<State, Pair>();
+    private static Map<String, List<Tuple<ArrayMove>>> keepMove;
+    private static Map<String, BestMove<ArrayMove>> keepBestMove;
     
     public M getBestMove(B board, int myTime, int opTime) {
-    	/*for(List<Tuple<ArrayMove>> lst : keepMove.values()) {
-    		for(Tuple<ArrayMove> t : lst) {
-    			t.resetVal();
-    		}
-    	}*/
-    	
         /* Calculate the best move */
     	//((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
-    	
+    	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
+    	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     	timer.start(myTime, opTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     	int depth = 2;
     	int newPly = ply;
-    	//if(50 - board.plyCount() / 2 <= 15) newPly++;
+    	if(50 - board.plyCount() / 2 <= 15) newPly++;
     	while(depth <= newPly) {
     		sortAll();
     		//BestMove<M> tmp;
-    		bestMove = POOL.invoke(new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false));
+    		bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, depth, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
     		/*if(tmp.value > bestMove.value) {
     			bestMove = tmp;
     		}*/
     		depth++;
     	}
-    	prevMove = tmpPrevMove;
-    	tmpPrevMove = (ArrayMove) bestMove.move;
     	return bestMove.move;
     }
     
@@ -119,20 +109,14 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		}
     	
 		protected BestMove<M> compute() {
-			
-			// TranspositionTable
-			/*if(keepBestMove.containsKey(new State((ArrayBoard) this.board, depth))) {
-				return (BestMove<M>) keepBestMove.get(new State((ArrayBoard) this.board, depth)).getBestMove();
-			}*/
-			
 			// exceed time allowed per move
-			/*if(limitTime && timer.stop() > timeAllowPerMove)) {
-				if(!keepBestMove.containsKey(new State((ArrayBoard) this.board, depth))) {
+			if(limitTime && (/*timer.timeup() ||*/ timer.stop() > timeAllowPerMove)) {
+				if(!keepBestMove.containsKey(this.board.fen())) {
 					return new BestMove<M>(-this.e.infty());
 				} else {
-					return (BestMove<M>) keepBestMove.get(new State((ArrayBoard) this.board, depth)).getBestMove();
+					return (BestMove<M>) keepBestMove.get(this.board.fen());
 				}
-			}*/
+			}
 			
 			M bestMove = null;
 			int indexBest = -1;
@@ -173,7 +157,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    		int value = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.e, this.board, null, this.depth - 1
 		    				, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false, false, ThreadLocalRandom.current().nextInt(2) == 1).compute().negate().value;
 		    		this.board.undoMove();
-		    		if (!checkEquals ? value > alpha : value >= alpha && prevMove != null && !move.serverString().equals(prevMove.serverString())) {
+		    		if (!checkEquals ? value > alpha : value >= alpha) {
 		    			alpha = value;
 		    			bestMove = move;
 		    			indexBest = i;
@@ -187,10 +171,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    			}
 		    			
 		    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
-		    			/*if(!keepBestMove.containsKey(new State((ArrayBoard) this.board, depth))) {
-		    				keepBestMove.put(new State((ArrayBoard) this.board, depth), new Pair((BestMove<ArrayMove>)best, depth));
-		    			}*/
-		    			
+		    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
 		    			return best;
 		    		}
 		    	}
@@ -211,28 +192,26 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 				
 				leftTask.fork();
 				BestMove<M> answer = rightTask.compute();
-				if(!checkEquals ? answer.value > alpha : answer.value >= alpha && prevMove != null && answer.move != null && !answer.move.serverString().equals(prevMove.serverString())) {
+				if(!checkEquals ? answer.value > alpha : answer.value >= alpha) {
 					alpha = answer.value;
 					bestMove = answer.move;
 					indexBest = answer.indexBest;
 				}
 				BestMove<M> leftAnswer = leftTask.join();
-				if(!checkEquals ? leftAnswer.value > alpha : leftAnswer.value >= alpha && prevMove != null && leftAnswer.move != null && !leftAnswer.move.serverString().equals(prevMove.serverString())) {
+				if(!checkEquals ? leftAnswer.value > alpha : leftAnswer.value >= alpha) {
 					alpha = leftAnswer.value;
 					bestMove = leftAnswer.move;
 					indexBest = leftAnswer.indexBest;
 				}
-				BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
 				if(!fromParallel) {
 					// add HH value
 	    			if(indexBest != -1) {
 	    				this.tupleMoves.get(indexBest).increment(1 << depth);
 	    				//Collections.sort(this.tupleMoves);
 	    			}
-	    			/*if(!keepBestMove.containsKey(new State((ArrayBoard) this.board, depth))) {
-	    				keepBestMove.put(new State((ArrayBoard) this.board, depth), new Pair((BestMove<ArrayMove>)best, depth));
-	    			}*/
 				}
+				BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
+    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
     			return best;
 			} else {
 				//this.board = this.board.copy();
@@ -272,7 +251,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    	DeepeningSubTask<M, B> current = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.e, this.board, (M) tupleMoves.get(ed - 1).getMove(), this.depth - 1, null, 0, -1, -this.beta, -this.alpha, this.cutoff, this.divideCutoff, false, false, ThreadLocalRandom.current().nextInt(2) == 1);
 		    	int value = current.compute().negate().value;
 		    	int r = ThreadLocalRandom.current().nextInt(2);
-		    	if (!checkEquals ? value > alpha : value >= alpha && prevMove != null  && !((M) this.tupleMoves.get(ed - 1).getMove()).serverString().equals(prevMove.serverString())) {
+		    	if (!checkEquals ? value > alpha : value >= alpha) {
 		    		alpha = value;
 		    		bestMove = (M) this.tupleMoves.get(ed - 1).getMove();
 		    		indexBest = ed - 1;
@@ -286,17 +265,14 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	    			}
 	    			
 	    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
-	    			/*if(!keepBestMove.containsKey(new State((ArrayBoard) this.board, depth))) {
-	    				keepBestMove.put(new State((ArrayBoard) this.board, depth), new Pair((BestMove<ArrayMove>)best, depth));
-	    			}*/
-	    			
+	    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
 	    			return best;
 		    	}
 		    	//---------------------
 		    	
 		    	for(int i = 0; i < taskList.size(); i++) {
 		    		value = taskList.get(i).join().negate().value;
-		    		if (!checkEquals ? value > alpha : value >= alpha && prevMove != null && !((M) this.tupleMoves.get(i + st).getMove()).serverString().equals(prevMove.serverString())) {
+		    		if (!checkEquals ? value > alpha : value >= alpha) {
 			    		alpha = value;
 			    		bestMove = (M) this.tupleMoves.get(i + st).getMove();
 			    		indexBest = i + st;
@@ -310,10 +286,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		    			}
 			    		
 		    			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
-		    			/*if(!keepBestMove.containsKey(new State((ArrayBoard) this.board, depth))) {
-		    				keepBestMove.put(new State((ArrayBoard) this.board, depth), new Pair((BestMove<ArrayMove>)best, depth));
-		    			}*/
-		    			
+		    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
 		    			return best;
 			    	}
 		    	}
@@ -325,13 +298,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     			}
 		    	
     			BestMove<M> best = new BestMove<M>(bestMove, alpha, indexBest);
-    			
-    			/*if(bestMove != null) {
-	    			if(!keepBestMove.containsKey(new State((ArrayBoard) this.board, depth))) {
-	    				keepBestMove.put(new State((ArrayBoard) this.board, depth), new Pair((BestMove<ArrayMove>)best, depth));
-	    			} 
-    			}*/
-    
+    			keepBestMove.put(this.board.fen(), (BestMove<ArrayMove>) best);
     			return best;
 			}
 		}
