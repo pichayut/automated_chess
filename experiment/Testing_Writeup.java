@@ -17,7 +17,7 @@ public class Testing_Writeup {
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/cutoff.txt"));
+    	PrintStream output = new PrintStream(new File("./experiment/JamboreeCutoff.txt"));
     	for(int i = 0; i <= 5; i++) {
     		Testing_Writeup game = new Testing_Writeup(i);
     		in = new Scanner(new File("./experiment/boards.txt"));
