@@ -27,9 +27,11 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     
     private static Map<String, List<Tuple<ArrayMove>>> keepMove;
     private static Map<String, BestMove<ArrayMove>> keepBestMove;
+    private static String startBoard;
     
     
     public M getBestMove(B board, int myTime, int opTime) {
+    	//startBoard = board.fen();
         /* Calculate the best move */
     	//((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
     	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
@@ -148,6 +150,13 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 		}
     	
 		protected BestMove<M> compute() {
+			
+			/*if(startBoard.equals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -")
+					&& (this.board.fen().equals("rnbqkbnr/pppp1ppp/8/4p3/8/8/PPPPPPPP/RNBQKBNR w KQkq -") ||
+							this.board.fen().equals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -"))) {
+				return new BestMove<M>(this.e.infty());
+	    	}*/
+			
 			// exceed time allowed per move
 			if(limitTime && (/*timer.timeup() ||*/ timer.stop() > timeAllowPerMove)) {
 				if(!keepBestMove.containsKey(this.board.fen())) {
