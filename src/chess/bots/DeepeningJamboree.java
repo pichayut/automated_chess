@@ -87,7 +87,12 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 	}
 
 	public static <M extends Move<M>> int compareCapture(Tuple<M> m1, Tuple<M> m2) {
-    	return Boolean.compare(m2.getMove().isCapture(), m1.getMove().isCapture());
+		int tmp = Boolean.compare(m2.getMove().isCapture(), m1.getMove().isCapture());
+    	if(tmp != 0) {
+    		return tmp;
+    	} else {
+    		return Boolean.compare(m2.getMove().isPromotion(), m1.getMove().isPromotion());
+    	}
     }
     
     /*private static int makeRandom() {
