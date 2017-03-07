@@ -13,10 +13,14 @@ import cse332.chess.interfaces.Move;
 public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
-	private static final ForkJoinPool POOL = new ForkJoinPool();
+	private static ForkJoinPool POOL = null;
 	private static final int DIVIDE_CUTOFF = 4;
 	private static int count = 0;
 	
+    public void numberProcessor(int processor) {
+    	POOL = new ForkJoinPool(processor);
+    }
+    
 	static class GetBestMoveTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {
 		int divideCutoff;
 		int cutoff;

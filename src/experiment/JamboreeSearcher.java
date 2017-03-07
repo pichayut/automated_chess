@@ -14,10 +14,14 @@ import cse332.chess.interfaces.Move;
 public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
         AbstractSearcher<M, B> {
 	
-	private static ForkJoinPool POOL = new ForkJoinPool();
+	private static ForkJoinPool POOL = null;
     private static final double PERCENTAGE_SEQUENTIAL = 0.5; //0.4375;
     private static final int DIVIDE_CUTOFF = 2;
     private static int count = 0;
+    
+    public void numberProcessor(int processor) {
+    	POOL = new ForkJoinPool(processor);
+    }
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
