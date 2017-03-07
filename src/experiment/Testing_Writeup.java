@@ -9,6 +9,7 @@ import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
 import chess.game.SimpleEvaluator;
 import cse332.chess.interfaces.Searcher;
+import tests.gitlab.TestingInputs;
 
 public class Testing_Writeup {
 	public static Searcher<ArrayMove, ArrayBoard> whitePlayer;
@@ -24,8 +25,9 @@ public class Testing_Writeup {
     		Testing_Writeup game = new Testing_Writeup(i);
     		in = new Scanner(new File("./experiment/boards.txt"));
             while(in.hasNextLine()) {
+            	long startTime = System.currentTimeMillis();
             	game.play(System.out, in.nextLine());
-            	output.println(((ParallelSearcher) whitePlayer).getCount() + " cutoff = " + i);
+            	output.println((System.currentTimeMillis() - startTime) + " cutoff = " + i);
             }
     	}
     	
