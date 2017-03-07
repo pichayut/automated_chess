@@ -111,7 +111,7 @@ parallel searchers.  You should test this at depth 5.  If you want it
 to go more quickly, now is a good time to figure out Google Compute
 Engine.   Plot your results and discuss which cut-offs work the best on each of
 your three boards.
-<pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)</pre>
+<pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)</pre> 
 
 #### Number Of Processors ####
 Now that you have found an optimal cut-off, you should find the optimal
