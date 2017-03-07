@@ -9,7 +9,6 @@ import chess.board.ArrayBoard;
 import chess.board.ArrayMove;
 import chess.game.SimpleEvaluator;
 import cse332.chess.interfaces.Searcher;
-import tests.gitlab.TestingInputs;
 
 public class Testing_Writeup {
 	public static Searcher<ArrayMove, ArrayBoard> whitePlayer;
