@@ -77,7 +77,7 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     		return ply + 3;
     	} else {
     		return ply + 4;
-    	}
+    	} 
 	}
 
 	private void sortAll() {
