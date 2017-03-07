@@ -149,12 +149,12 @@ for each of the three boards.
 Plot your results and discuss anything surprising about your results here.
 <pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)</pre>
 
-|      Algorithm     | Early Game | Mid Game | End Game |
+|      Algorithm     | Early Game | Mid Game | End Game | (ms)
 | :----------------: |:----------:|:--------:|:--------:|
-|       Minimax      |            |          |          |
-|  Parallel Minimax  |            |          |          |
-|      Alphabeta     |            |          |          |
-|      Jamboree      |            |          |          |
+|       Minimax      |   4874     |  26750   |    420   |
+|  Parallel Minimax  |   1775     |   3087   |     78   |
+|      Alphabeta     |    321     |   1157   |    125   |
+|      Jamboree      |    282     |    822   |     67   |
 
 
 ### Beating Traffic ###
