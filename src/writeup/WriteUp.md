@@ -133,7 +133,10 @@ ForkJoinPool POOL = new ForkJoinPool(k);
 ```
 Plot your results and discuss which number of processors works the best on each
 of the three boards.
-<pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)</pre>
+<pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)
+
+Jamb : Early => 16, Mid => 32, End => 16
+Parallel Minimax : Early => 16, Mid => 32, End => 32 or 16</pre>
 
 #### Comparing The Algorithms ####
 Now that you have found an optimal cut-off and an optimal number of processors, 

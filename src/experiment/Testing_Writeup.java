@@ -19,17 +19,15 @@ public class Testing_Writeup {
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/JamboreeProcessor.txt"));
-    	for(int i = 1; i <= 32; i = i * 2) {
+    	PrintStream output = new PrintStream(new File("./experiment/JamboreeRuntime.txt"));
     		Testing_Writeup game = new Testing_Writeup();
-    		((JamboreeSearcher) whitePlayer).numberProcessor(i);
+    		((JamboreeSearcher) whitePlayer).numberProcessor(32);
     		in = new Scanner(new File("./experiment/boards.txt"));
             while(in.hasNextLine()) {
             	long startTime = System.currentTimeMillis();
             	game.play(System.out, in.nextLine());
-            	output.println((System.currentTimeMillis() - startTime) + " processor = " + i);
+            	output.println((System.currentTimeMillis() - startTime));
             }
-    	}
     	
     	/*
     	if (true) {
