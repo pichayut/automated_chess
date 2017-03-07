@@ -24,8 +24,9 @@ public class Testing_Writeup {
     		Testing_Writeup game = new Testing_Writeup(i);
     		in = new Scanner(new File("./experiment/boards.txt"));
             while(in.hasNextLine()) {
+            	long startTime = System.currentTimeMillis();
             	game.play(System.out, in.nextLine());
-            	output.println(((ParallelSearcher) whitePlayer).getCount() + " cutoff = " + i);
+            	output.println((System.currentTimeMillis() - startTime) + " cutoff = " + i);
             }
     	}
     	
