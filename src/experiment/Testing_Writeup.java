@@ -19,7 +19,7 @@ public class Testing_Writeup {
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/ParallelSearcherRuntime.txt"));
+    	PrintStream output = new PrintStream(new File("./experiment/AlphaBetaSearcherRuntime.txt"));
     		Testing_Writeup game = new Testing_Writeup();
     		//((ParallelSearcher) whitePlayer).numberProcessor(32);
     		in = new Scanner(new File("./experiment/boards.txt"));
