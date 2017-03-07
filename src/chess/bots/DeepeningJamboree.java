@@ -54,14 +54,14 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     	int cnt = ((ArrayBoard)board).countOfAllPieces();
     	int cntOp = ((ArrayBoard)board).countOfColor((((ArrayBoard)board).toPlay() + 1) % 2);
     	
-    	if(myTime <= 1000) {
-    		timeAllowPerMove = 1000;
+    	if(myTime <= 10000) {
+    		timeAllowPerMove = 750;
     		return 1;
-    	} else if(myTime <= 10000) {
+    	} else if(myTime <= 20000) {
     		timeAllowPerMove = 1500;
     		return 3;
     	} else if(myTime <= 30000) {
-    		timeAllowPerMove = 5000;
+    		timeAllowPerMove = 3000;
     		return ply;
     	}
     	
