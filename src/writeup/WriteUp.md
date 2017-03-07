@@ -152,9 +152,9 @@ Plot your results and discuss anything surprising about your results here.
 |      Algorithm     | Early Game | Mid Game | End Game |
 | :----------------: |:----------:|:--------:|:--------:|
 |       Minimax      |   4874     |  26750   |    420   |
-|  Parallel Minimax  |   1775     |   3087   |     78   |
+|  Parallel Minimax  |   1598     |   3087   |     60   |
 |      Alphabeta     |    321     |   1157   |    125   |
-|      Jamboree      |    282     |    822   |     67   |
+|      Jamboree      |    242     |    822   |     59   |
 
 
 ### Beating Traffic ###
