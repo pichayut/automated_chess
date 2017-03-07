@@ -22,7 +22,9 @@
 
 ## The Chess Server ##
 - When you faced Clamps, what did the code you used do?  Was it just your jamboree?  Did you do something fancier?
-  <pre>It was an implementation of JamboreeSearcher with move ordering added.</pre>
+  <pre>It was an implementation of JamboreeSearcher with move ordering due to the heuristic methodology. For example,
+  we combined the history heuristic with the capturing heuristic. Also, we implemented iterative deepening to help
+  speed things up and to find the history for the heuristics.</pre>
 
 - Did you enjoy watching your bot play on the server?  Is your bot better at chess than you are?
   <pre>Yes, it was very neat to see it actually play out and work. The bot is much better at chess than we are since you know, it's a computer
@@ -32,7 +34,7 @@
   <pre>No.</pre>
 
 - Did you do any Above and Beyond?  Describe exactly what you implemented.
-  <pre>Not yet, but we might try and beat the other bots.</pre>
+  <pre>Yes, we have fought against flexo and have won some games against him. </pre>
 
 ## Experiments ##
 
