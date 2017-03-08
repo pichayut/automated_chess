@@ -113,7 +113,7 @@ parallel searchers.  You should test this at depth 5.  If you want it
 to go more quickly, now is a good time to figure out Google Compute
 Engine.   Plot your results and discuss which cut-offs work the best on each of
 your three boards.
-<pre>To look at our results, go <a href="./experiment/P3_Sequential_Cutoff.pdf">here</a>. All of the tests were
+<pre>To look at our results, go <a href="./src/experiment/P3_Sequential_Cutoff.pdf">here</a>. All of the tests were
 run on the Google Compute Engine. As a summary, we found that there was a local minimum for the 
 time taken to play both the early, mid, and end game. The local minimum was at a cut-off of 2, 
 so we found that to be the optimal cut-off for both Jamboree and Parallel Minimax.
@@ -135,7 +135,7 @@ ForkJoinPool POOL = new ForkJoinPool(k);
 ```
 Plot your results and discuss which number of processors works the best on each
 of the three boards.
-<pre>To look at our results, go <a href="./experiment/P3_Processors.pdf">here</a>. All of the tests were
+<pre>To look at our results, go <a href="./src/experiment/P3_Processors.pdf">here</a>. All of the tests were
 run on the Google Compute Engine. As a summary, we found that there was a large correlation 
 between number of processors and the time taken to play each of our boards. For ease, we replotted
 the early and end game for both Jamboree and Parallel Minimax simply because the runtime for 
@@ -159,7 +159,7 @@ cut-offs and the optimal number of processors, time all four of your algorithms
 for each of the three boards.
 
 Plot your results and discuss anything surprising about your results here.
-<pre>To see this chart in a plot, go <a href="./experiment/P3_Runtime.pdf">here</a>. All of the tests were
+<pre>To see this chart in a plot, go <a href="./src/experiment/P3_Runtime.pdf">here</a>. All of the tests were
 run on the Google Compute Engine. As a summary, we found that the Jamboree ran much faster than 
 the other algorithms which is understandable since it takes the pruning from Alphabeta and 
 then computes the results in parallel. For the optimal settings, we used a depth of 5, 
