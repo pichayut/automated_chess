@@ -166,7 +166,7 @@ then computes the results in parallel. For the optimal settings, we used a depth
 cut-off of 2, and 16 processors for the early and end game and 32 processors for the mid game.
 
 Also, for this test, we only changed the white player and kept the black player at a depth of 4, cut-off
-of 4, and the standard number of processors (we didn't adjust the value at all).</pre>
+of 4, and the standard number of processors (we didn't adjust the value at all).</pre> 
 
 |      Algorithm     | Early Game (16 processors) | Mid Game (32 processors) | End Game (16 processors) |
 | :----------------: |:----------:|:--------:|:--------:|
