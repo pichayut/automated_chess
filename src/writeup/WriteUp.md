@@ -113,11 +113,13 @@ parallel searchers.  You should test this at depth 5.  If you want it
 to go more quickly, now is a good time to figure out Google Compute
 Engine.   Plot your results and discuss which cut-offs work the best on each of
 your three boards.
-<pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)
-Jamboree = 2
-Parallel Minimax = 3
+<pre>To look at our results, go <a href="P3_Sequential_Cutoff.pdf">here</a>. All of the tests were
+run on the Google Compute Engine. As a summary, we found that there was a local minimum for the 
+time taken to play both the early, mid, and end game. The local minimum was at a cut-off of 2, 
+so we found that to be the optimal cut-off for both Jamboree and Parallel Minimax.
 
-Only change white player, black player depth = 4 cutoff = 4, untouched processor.</pre>
+Also, for this test, we only changed the white player and kept the black player at a depth of 4, cut-off
+of 4, and the standard number of processors (we didn't adjust the value at all).</pre>
 
 #### Number Of Processors ####
 Now that you have found an optimal cut-off, you should find the optimal
@@ -133,10 +135,20 @@ ForkJoinPool POOL = new ForkJoinPool(k);
 ```
 Plot your results and discuss which number of processors works the best on each
 of the three boards.
-<pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)
+<pre>To look at our results, go <a href="P3_Processors.pdf">here</a>. All of the tests were
+run on the Google Compute Engine. As a summary, we found that there was a large correlation 
+between number of processors and the time taken to play each of our boards. For ease, we replotted
+the early and end game for both Jamboree and Parallel Minimax simply because the runtime for 
+these two boards was significantly smaller than for the mid game. The end game was also replotted
+for Parallel Minimax since its runtime was significantly smaller than the early game.
+For the early game for both Jamboree and Parallel Minimax, we found that 16 processors was optimal.
+For the mid game for both Jamboree and Parallel Minimax, we found that 32 processors was optimal.
+For the end game for both Jamboree and Parallel Minimax, we found that 16 processors was optimal.
+Even though the early and end game could use the 32 processors, but we found that it didn't 
+drastically change the timing, so we kept it down to 16 processors.
 
-Jamb : Early => 16, Mid => 32, End => 16
-Parallel Minimax : Early => 16, Mid => 32, End => 32 or 16</pre>
+Also, for this test, we only changed the white player and kept the black player at a depth of 4, cut-off
+of 4, and the standard number of processors (we didn't adjust the value at all).</pre>
 
 #### Comparing The Algorithms ####
 Now that you have found an optimal cut-off and an optimal number of processors, 
@@ -147,9 +159,16 @@ cut-offs and the optimal number of processors, time all four of your algorithms
 for each of the three boards.
 
 Plot your results and discuss anything surprising about your results here.
-<pre>TODO: Do the experiment; discuss the results (possibly with pretty graphs!)</pre>
+<pre>To see this chart in a plot, go <a href="P3_Runtime.pdf">here</a>. All of the tests were
+run on the Google Compute Engine. As a summary, we found that the Jamboree ran much faster than 
+the other algorithms which is understandable since it takes the pruning from Alphabeta and 
+then computes the results in parallel. For the optimal settings, we used a depth of 5, 
+cut-off of 2, and 16 processors for the early and end game and 32 processors for the mid game.
 
-|      Algorithm     | Early Game (16 bits) | Mid Game (32 bits) | End Game (16 bits) |
+Also, for this test, we only changed the white player and kept the black player at a depth of 4, cut-off
+of 4, and the standard number of processors (we didn't adjust the value at all).</pre>
+
+|      Algorithm     | Early Game (16 processors) | Mid Game (32 processors) | End Game (16 processors) |
 | :----------------: |:----------:|:--------:|:--------:|
 |       Minimax      |   4874     |  26750   |    420   |
 |  Parallel Minimax  |   1598     |   3087   |     60   |
