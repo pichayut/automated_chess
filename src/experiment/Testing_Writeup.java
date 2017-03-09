@@ -20,12 +20,12 @@ public class Testing_Writeup {
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./src/experiment/JamboreeCutoff100.txt"));
+    	PrintStream output = new PrintStream(new File("./experiment/JamboreeCutoff100.txt"));
 		for (int i = 0; i < TRIALS; i++) {
 			for (int j = 0; j <= 5; j++) {
 				Testing_Writeup game = new Testing_Writeup(j);
 		    	((JamboreeSearcher) whitePlayer).numberProcessor(-1);
-	    		in = new Scanner(new File("./src/experiment/boards.txt"));
+	    		in = new Scanner(new File("./experiment/boards.txt"));
 	            while(in.hasNextLine()) {
 	            	long startTime = System.currentTimeMillis();
 	            	game.play(in.nextLine());
