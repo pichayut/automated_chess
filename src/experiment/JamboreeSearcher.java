@@ -20,13 +20,16 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
     private static int count = 0;
     
     public void numberProcessor(int processor) {
-    	POOL = new ForkJoinPool(processor);
+    	if (processor == -1) {
+    		POOL = new ForkJoinPool();
+    	} else {
+    		POOL = new ForkJoinPool(processor);
+    	}
     }
     
     public M getBestMove(B board, int myTime, int opTime) {
         /* Calculate the best move */
-    	BestMove<M> bestMove = POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false));
-        return bestMove.move;
+    	return POOL.invoke(new JamboreeSubTask<M, B>(this.evaluator, board, null, ply, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false)).move;
     }
     
     public int getCount(){

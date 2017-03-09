@@ -18,7 +18,11 @@ public class ParallelSearcher<M extends Move<M>, B extends Board<M, B>> extends
 	private static int count = 0;
 	
     public void numberProcessor(int processor) {
-    	POOL = new ForkJoinPool(processor);
+    	if (processor == -1) {
+    		POOL = new ForkJoinPool();
+    	} else {
+    		POOL = new ForkJoinPool(processor);
+    	}
     }
     
 	static class GetBestMoveTask<M extends Move<M>, B extends Board<M, B>> extends RecursiveTask<BestMove<M>> {

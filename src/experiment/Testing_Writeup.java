@@ -13,21 +13,26 @@ import cse332.chess.interfaces.Searcher;
 public class Testing_Writeup {
 	public static Searcher<ArrayMove, ArrayBoard> whitePlayer;
     public Searcher<ArrayMove, ArrayBoard> blackPlayer;
+    public static final int TRIALS = 3;
     public static final String STARTING_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     
     private ArrayBoard board;
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/JamboreeRuntime_16.txt"));
-    		Testing_Writeup game = new Testing_Writeup();
-    		((JamboreeSearcher) whitePlayer).numberProcessor(16);
-    		in = new Scanner(new File("./experiment/boards.txt"));
-            while(in.hasNextLine()) {
-            	long startTime = System.currentTimeMillis();
-            	game.play(System.out, in.nextLine());
-            	output.println((System.currentTimeMillis() - startTime));
-            }
+    	PrintStream output = new PrintStream(new File("./src/experiment/JamboreeCutoff1.txt"));
+		for (int i = 0; i < TRIALS; i++) {
+			for (int j = 0; j <= 5; j++) {
+				Testing_Writeup game = new Testing_Writeup(j);
+		    	((JamboreeSearcher) whitePlayer).numberProcessor(-1);
+	    		in = new Scanner(new File("./src/experiment/boards.txt"));
+	            while(in.hasNextLine()) {
+	            	long startTime = System.currentTimeMillis();
+	            	game.play(in.nextLine());
+	            	output.println((System.currentTimeMillis() - startTime) + " " + j + " " + i);
+	            }
+			}
+		}
     	
     	/*
     	if (true) {
@@ -40,12 +45,12 @@ public class Testing_Writeup {
         in.close();
     }
 
-    public Testing_Writeup() {
-        setupWhitePlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 5, 2);
+    public Testing_Writeup(int cutoff) {
+        setupWhitePlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 5, cutoff);
         setupBlackPlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 4, 4);
     }
     
-    public void play(PrintStream out, String currentBoard) {
+    public void play(String currentBoard) {
        this.board = ArrayBoard.FACTORY.create().init(currentBoard);
        Searcher<ArrayMove, ArrayBoard> currentPlayer = this.blackPlayer;
        
@@ -54,7 +59,7 @@ public class Testing_Writeup {
        /* Note that this code does NOT check for stalemate... */
        //while (!board.inCheck() || board.generateMoves().size() > 0) {
            currentPlayer = currentPlayer.equals(this.whitePlayer) ? this.blackPlayer : this.whitePlayer;
-           out.println(board.fen());
+           //System.out.println(board.fen());
            this.board.applyMove(currentPlayer.getBestMove(board, 1000, 1000));
            turn++;
        //}
