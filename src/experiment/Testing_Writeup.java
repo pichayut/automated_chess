@@ -29,7 +29,7 @@ public class Testing_Writeup {
 	            while(in.hasNextLine()) {
 	            	long startTime = System.currentTimeMillis();
 	            	game.play(in.nextLine());
-	            	output.println((System.currentTimeMillis() - startTime) + " " + j + " " + i);
+	            	output.println((System.currentTimeMillis() - startTime));
 	            }
 			}
 		}
