@@ -16,7 +16,7 @@
   so it would have been nice to know about that before hand so that we could have acted accordingly.</pre>
 
 - Did you enjoy the project?
-  <pre>Yes, we did.</pre>
+  <pre>Yes, we did.</pre> 
     
 -----
 
@@ -34,7 +34,8 @@
   <pre>No.</pre>
 
 - Did you do any Above and Beyond?  Describe exactly what you implemented.
-  <pre>Yes, we have fought against flexo and have won some games against him. </pre>
+  <pre>Yes, we have fought against flexo and have won some games against him. We have also been able to fight against bender
+  and win games against him as well.</pre>
 
 ## Experiments ##
 
