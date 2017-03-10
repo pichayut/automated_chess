@@ -23,19 +23,14 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
     private static final double FACTION = 1; //0.65;
     private static int timeAllowPerMove = 20000;
     private static final boolean limitTime = true;
-    private static Random rt = new Random();
     
-    private static Map<String, List<Tuple<ArrayMove>>> keepMove;
-    private static Map<String, BestMove<ArrayMove>> keepBestMove;
-    private static String startBoard;
-    
+    private static Map<String, List<Tuple<ArrayMove>>> keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
+    private static Map<String, BestMove<ArrayMove>> keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     
     public M getBestMove(B board, int myTime, int opTime) {
     	//startBoard = board.fen();
         /* Calculate the best move */
     	//((SimpleTimer)timer).setNewCons(50 - board.plyCount() / 2);
-    	keepMove = new ConcurrentHashMap<String, List<Tuple<ArrayMove>>>();
-    	keepBestMove = new ConcurrentHashMap<String, BestMove<ArrayMove>>();
     	timer.start(myTime, opTime);
     	int newPly = add(board, myTime);
     	BestMove<M> bestMove = new DeepeningSubTask<M, B>((SimpleTimer)timer, this.evaluator, board, null, 1, null, 0, -1, -this.evaluator.infty(), this.evaluator.infty(), cutoff, DIVIDE_CUTOFF, false, false, false).compute();
@@ -269,12 +264,11 @@ public class DeepeningJamboree<M extends Move<M>, B extends Board<M, B>> extends
 				}
 				
 				if(this.tupleMoves == null) {
-					List<M> tmpMoves;
 					if(keepMove.containsKey(this.board.fen())) {
 						this.tupleMoves = keepMove.get(this.board.fen());
 						//Collections.sort(this.tupleMoves);
 					} else {
-						tmpMoves = this.board.generateMoves();
+						List<M> tmpMoves = this.board.generateMoves();
 						this.tupleMoves = new ArrayList<Tuple<ArrayMove>>();
 			    		for(int i = 0; i < tmpMoves.size(); i++) {
 			    			this.tupleMoves.add(new Tuple<ArrayMove>((ArrayMove) tmpMoves.get(i), 0));

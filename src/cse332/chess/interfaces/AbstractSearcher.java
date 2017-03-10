@@ -8,7 +8,7 @@ import chess.game.SimpleTimer;
 public abstract class AbstractSearcher<M extends Move<M>, B extends Board<M, B>>
         implements Searcher<M, B> {
     protected Evaluator<B> evaluator;
-    protected Timer timer;
+    protected static Timer timer;
     protected int ply;
     protected int cutoff;
 
