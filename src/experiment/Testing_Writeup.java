@@ -13,14 +13,14 @@ import cse332.chess.interfaces.Searcher;
 public class Testing_Writeup {
 	public static Searcher<ArrayMove, ArrayBoard> whitePlayer;
     public Searcher<ArrayMove, ArrayBoard> blackPlayer;
-    public static final int TRIALS = 100;
+    public static final int TRIALS = 56;
     public static final String STARTING_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     
     private ArrayBoard board;
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/ParallelSearcherCutoff100.txt"));
+    	PrintStream output = new PrintStream(new File("./experiment/ParallelSearcherCutoff100_1.txt"));
 		for (int i = 0; i < TRIALS; i++) {
 			for (int j = 0; j <= 5; j++) {
 				Testing_Writeup game = new Testing_Writeup(j);
