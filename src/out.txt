@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Run this script with:
+#   source <(curl -s https://courses.cs.washington.edu/courses/cse332/gce/setup-instance.sh)
+
+PROJECT=p3
+QUARTER=17wi
+
+(
+cd ~;
+
+if [ ! -d ~/.setup ]; then
+    mkdir -p ~/.setup
+
+    echo -n "Installing Software..."
+    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list > /dev/null
+    echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list > /dev/null
+    echo -n "Working..."
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 &> /dev/null
+    echo -n "..."
+    sudo apt-get update -y &> /dev/null 
+    echo -n "..."
+    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+    sudo apt-get install -y git vim oracle-java8-installer
+    echo -n "..."
+    echo "Done Installing Software!"
+
+    echo ""
+fi
+if [ ! -e ~/.setup/teamname ]; then
+    read -p "Enter Your Teamname: " TEAMNAME;
+    echo $TEAMNAME > ~/.setup/teamname;
+fi
+TEAMNAME=$(cat ~/.setup/teamname)
+    
+if [ ! -e ~/.ssh/gitlab ]; then
+    echo "Generating an RSA Key to communicate with gitlab..."
+    ssh-keygen -t rsa -b 4096 -f ~/.ssh/gitlab -N '' > /dev/null
+
+    echo -e "Host gitlab.cs.washington.edu\n\tIdentityFile ~/.ssh/gitlab\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+    echo "Copy Your Public Key To Gitlab (https://gitlab.cs.washington.edu/profile/keys/new):"
+    cat ~/.ssh/gitlab.pub
+    echo "Please read the above instructions.  There is something for you to do here."
+    echo "Then, press enter To Continue..."
+
+    read;
+fi
+
+echo "Getting the most up-to-date version of your files..."
+
+if [ ! -e ~/${PROJECT}-${TEAMNAME} ]; then
+    git clone "git@gitlab.cs.washington.edu:cse332-${QUARTER}/${PROJECT}-${TEAMNAME}.git"
+    cd ~/${PROJECT}-${TEAMNAME}; 
+else
+    cd ~/${PROJECT}-${TEAMNAME}; 
+    git pull;
+fi
+exit;
+) < /dev/tty
+
+TEAMNAME=$(cat ~/.setup/teamname)
+cd ~/${PROJECT}-${TEAMNAME}/src
+
+(
+echo "Compiling all your source files..."
+
+# Compile All The Java Files
+find -name "*.java" > .javafiles;
+javac -Xlint:none @.javafiles;
+RESULT=$?;
+
+if [ $RESULT -ne 0 ]; then
+    for f in `cat .javafiles`; do
+        echo "Compiling ${f}...";
+        javac -Xlint:none $f;
+    done
+fi
+
+for file in $(cat .javafiles); do
+    if grep "public static void main" $file > /dev/null; then
+        name=$(basename file)
+        run=$(echo ${file%.*} | sed -e "s/^..//")
+        echo "To run ${name}, type:"
+        echo "    java ${run}"
+    fi
+done)
