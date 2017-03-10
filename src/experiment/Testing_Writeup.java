@@ -13,18 +13,18 @@ import cse332.chess.interfaces.Searcher;
 public class Testing_Writeup {
 	public static Searcher<ArrayMove, ArrayBoard> whitePlayer;
     public Searcher<ArrayMove, ArrayBoard> blackPlayer;
-    public static final int TRIALS = 56;
+    public static final int TRIALS = 50;
     public static final String STARTING_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     
     private ArrayBoard board;
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/ParallelSearcherCutoff100_1.txt"));
+    	PrintStream output = new PrintStream(new File("./experiment/ParallelSearcherProcessor100.txt"));
 		for (int i = 0; i < TRIALS; i++) {
-			for (int j = 0; j <= 5; j++) {
-				Testing_Writeup game = new Testing_Writeup(j);
-		    	((ParallelSearcher) whitePlayer).numberProcessor(-1);
+			for (int j = 1; j <= 32; j = j * 2) {
+				Testing_Writeup game = new Testing_Writeup(2);
+		    	((ParallelSearcher) whitePlayer).numberProcessor(j);
 	    		in = new Scanner(new File("./experiment/boards.txt"));
 	            while(in.hasNextLine()) {
 	            	long startTime = System.currentTimeMillis();
@@ -32,6 +32,7 @@ public class Testing_Writeup {
 	            	output.println((System.currentTimeMillis() - startTime));
 	            }
 			}
+			System.out.println(i);
 		}
     	
     	/*
@@ -43,6 +44,7 @@ public class Testing_Writeup {
     	*/
         
         in.close();
+        output.close();
     }
 
     public Testing_Writeup(int cutoff) {
