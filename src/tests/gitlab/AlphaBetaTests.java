@@ -7,13 +7,14 @@ import cse332.chess.interfaces.Move;
 import cse332.chess.interfaces.Searcher;
 
 import chess.bots.AlphaBetaSearcher;
+import chess.bots.IterativeDeepening;
 import tests.TestsUtility;
 import tests.gitlab.TestingInputs;
 
 public class AlphaBetaTests extends SearcherTests {
 
 	public static void main(String[] args) { new AlphaBetaTests().run(); }
-    public static void init() { STUDENT = new AlphaBetaSearcher<ArrayMove, ArrayBoard>(); }
+    public static void init() { STUDENT = new IterativeDeepening<ArrayMove, ArrayBoard>(); }
 	
 	@Override
 	protected void run() {

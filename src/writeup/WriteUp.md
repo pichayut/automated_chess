@@ -114,9 +114,9 @@ parallel searchers.  You should test this at depth 5.  If you want it
 to go more quickly, now is a good time to figure out Google Compute
 Engine.   Plot your results and discuss which cut-offs work the best on each of
 your three boards.
-<pre>To look at our results, go <a href="./src/experiment/P3_Sequential_Cutoff.pdf">here</a>. All of the tests were
-run on the Google Compute Engine. As a summary, we found that there was a local minimum for the 
-time taken to play both the early, mid, and end game. The local minimum was at a cut-off of 2, 
+<pre>To look at our results, go <a href="./src/experiment/P3_Sequential_Cutoff_100.pdf">here</a>. All of the tests were
+run on the Google Compute Engine and we ran the test 50 different times. As a summary, we found that there was a local 
+minimum for the time taken to play both the early, mid, and end game. The local minimum was at a cut-off of 2, 
 so we found that to be the optimal cut-off for both Jamboree and Parallel Minimax.
 
 Also, for this test, we only changed the white player and kept the black player at a depth of 4, cut-off
@@ -136,16 +136,13 @@ ForkJoinPool POOL = new ForkJoinPool(k);
 ```
 Plot your results and discuss which number of processors works the best on each
 of the three boards.
-<pre>To look at our results, go <a href="./src/experiment/P3_Processors.pdf">here</a>. All of the tests were
-run on the Google Compute Engine. As a summary, we found that there was a large correlation 
-between number of processors and the time taken to play each of our boards. For ease, we replotted
-the early and end game for both Jamboree and Parallel Minimax simply because the runtime for 
-these two boards was significantly smaller than for the mid game. The end game was also replotted
-for Parallel Minimax since its runtime was significantly smaller than the early game.
+<pre>To look at our results, go <a href="./src/experiment/P3_Processors_100.pdf">here</a>. All of the tests were
+run on the Google Compute Engine and we ran the test 50 different times. As a summary, we found that there 
+was a large correlation between number of processors and the time taken to play each of our boards.
 For the early game for both Jamboree and Parallel Minimax, we found that 16 processors was optimal.
 For the mid game for both Jamboree and Parallel Minimax, we found that 32 processors was optimal.
 For the end game for both Jamboree and Parallel Minimax, we found that 16 processors was optimal.
-Even though the early and end game could use the 32 processors, but we found that it didn't 
+Even though the early and end game could use the 32 processors, we found that it didn't 
 drastically change the timing, so we kept it down to 16 processors.
 
 Also, for this test, we only changed the white player and kept the black player at a depth of 4, cut-off

@@ -25,9 +25,4 @@ public class Pair {
 		Pair o = (Pair) obj;
 		return this.bestMove.move.equals(o.bestMove.move) && this.bestMove.value == o.bestMove.value && this.depth == o.depth;
 	}
-	
-	@Override
-	public int hashCode() {
-		return bestMove.hashCode() * 31 + depth;
-	}
 }
