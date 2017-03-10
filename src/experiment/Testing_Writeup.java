@@ -20,11 +20,11 @@ public class Testing_Writeup {
     
     public static void main(String[] args) throws FileNotFoundException {
     	Scanner in = null;
-    	PrintStream output = new PrintStream(new File("./experiment/JamboreeProcessor100.txt"));
+    	PrintStream output = new PrintStream(new File("./experiment/ParallelSearcherCutoff100.txt"));
 		for (int i = 0; i < TRIALS; i++) {
-			for (int j = 1; j <= 32; j = j * 2) {
-				Testing_Writeup game = new Testing_Writeup(2);
-		    	((JamboreeSearcher) whitePlayer).numberProcessor(j);
+			for (int j = 0; j <= 5; j++) {
+				Testing_Writeup game = new Testing_Writeup(j);
+		    	((ParallelSearcher) whitePlayer).numberProcessor(-1);
 	    		in = new Scanner(new File("./experiment/boards.txt"));
 	            while(in.hasNextLine()) {
 	            	long startTime = System.currentTimeMillis();
@@ -48,8 +48,8 @@ public class Testing_Writeup {
     }
 
     public Testing_Writeup(int cutoff) {
-        setupWhitePlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 5, cutoff);
-        setupBlackPlayer(new JamboreeSearcher<ArrayMove, ArrayBoard>(), 4, 4);
+        setupWhitePlayer(new ParallelSearcher<ArrayMove, ArrayBoard>(), 5, cutoff);
+        setupBlackPlayer(new ParallelSearcher<ArrayMove, ArrayBoard>(), 4, 4);
     }
     
     public void play(String currentBoard) {
