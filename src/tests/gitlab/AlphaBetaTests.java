@@ -7,7 +7,6 @@ import cse332.chess.interfaces.Move;
 import cse332.chess.interfaces.Searcher;
 
 import chess.bots.AlphaBetaSearcher;
-import chess.bots.IterativeDeepening;
 import tests.TestsUtility;
 import tests.gitlab.TestingInputs;
 
