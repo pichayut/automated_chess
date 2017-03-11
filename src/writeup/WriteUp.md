@@ -185,15 +185,21 @@ formalization of the traffic problem as a graph in this question.
   Dijkstra's Algorithm to solve this problem instead of Minimax, how would you
   formulate it as a graph?
   <pre>Each of the nodes would be the location and the edges connecting the nodes would be the roads to 
-  the different locations. The weights for each edge would be the traffic and distance from the evaluation
-  function. Then, Dijkstra's Algorithm would find the minimum traffic and distance from a start node to every
+  the different locations. The weights for each edge would be the traffic or distance from the evaluation
+  function. Then, Dijkstra's Algorithm would find the minimum traffic or distance from a start node to every
   other node.</pre>
 
 - These two algorithms DO NOT optimize for the same thing.  (If they did,
   Dijkstra's is always faster; so, there would be no reason to ever use
   Minimax.)  Describe the difference in what each of the algorithms is
   optimizing for.  When will they output different paths?
-  <pre>Minimax is finding the path from one node to every other node, but it is just a path and not necessarily
-  the minimum traffic and distance. Minimax is finding the most efficient path in terms of the traffic making "moves".
-   Dijkstra's finds the minimum traffic and distance path to each node from a starting node, and this path may 
-   not be the most efficient path.</pre>
+  <pre> Since we are allowed to have only one value representing edges, Dijkstra's can be used to find 
+  the minimum of either traffic, distance, or time from the starting location to the destination. However,
+  Minimax has an evaluator that "attempts" to find the "best" path from among many data. Evaluator can 
+  return a single value as a weight in the graph by calculating some function that takes more than one arguments
+  and return the value represented them. For example, if we want to find the shortest time that also have the
+  fewest distance, we cannot do that in Dijkstra's because we cannot store more than one variable on each edge. 
+  On the other hand, the evaluator of Minimax can "attempt" to return a value representing that the same shortest
+  time who has fewer distance will be evaluated "greater". However, Minimax is slower than Dijkstra's algorithm.
+  To sum up, Dijkstra's optimizes in terms of time complexity, but Minimax optimizes in terms of best path
+  among of the data (more than one data).</pre>

@@ -13,7 +13,7 @@ import tests.gitlab.TestingInputs;
 public class JamboreeTests extends SearcherTests {
 
     public static void main(String[] args) { new JamboreeTests().run(); }
-    public static void init() { STUDENT = new DeepeningJamboree<ArrayMove, ArrayBoard>(); }
+    public static void init() { STUDENT = new JamboreeSearcher<ArrayMove, ArrayBoard>(); }
 
 	
 	@Override
@@ -33,7 +33,7 @@ public class JamboreeTests extends SearcherTests {
         long endTime = System.currentTimeMillis();
         System.out.println(endTime - startTime);
         startTime = System.currentTimeMillis();
-        test("depth6", TestingInputs.FENS_TO_TEST.length);
+        //test("depth6", TestingInputs.FENS_TO_TEST.length);
         endTime = System.currentTimeMillis();
         System.out.println(endTime - startTime);
         

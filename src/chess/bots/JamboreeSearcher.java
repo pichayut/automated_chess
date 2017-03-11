@@ -54,7 +54,9 @@ public class JamboreeSearcher<M extends Move<M>, B extends Board<M, B>> extends
 		protected BestMove<M> compute() {
 			M bestMove = null;
 			if(!alreadyHaveGoodAlphaBeta) {
-				this.board = this.board.copy();
+				if(move != null && moves == null) { // If apply move, have to copy board
+					this.board = this.board.copy();
+				}
 				if(this.move != null) {
 					this.board.applyMove(this.move);
 					this.move = null;
