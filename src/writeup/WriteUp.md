@@ -193,7 +193,7 @@ formalization of the traffic problem as a graph in this question.
   Dijkstra's is always faster; so, there would be no reason to ever use
   Minimax.)  Describe the difference in what each of the algorithms is
   optimizing for.  When will they output different paths?
-  <pre> Since we are allowed to have only one value representing edges, Dijkstra's can be used to find 
+  <pre>Since we are allowed to have only one value representing edges, Dijkstra's can be used to find 
   the minimum of either traffic, distance, or time from the starting location to the destination. However,
   Minimax has an evaluator that "attempts" to find the "best" path from among many data. Evaluator can 
   return a single value as a weight in the graph by calculating some function that takes more than one arguments
